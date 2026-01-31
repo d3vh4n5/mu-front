@@ -10,13 +10,12 @@ import OnlinePlayers from "./OnlinePlayers.astro";
 		<slot></slot>
 	</section>
 	<section class="right">
-		<div>
+		<div class="right-container">
 
 			<OnlinePlayers/>
+			<hr>
 			<RankTable/>
-			<p>
-				Donaciones o propagandas?
-			</p>
+			<hr>
 			<Image
 				src={eventsImg}
 				alt="Imagen principal"
@@ -27,7 +26,7 @@ import OnlinePlayers from "./OnlinePlayers.astro";
 </main>
 <style>
 	main{
-		padding-top: 20px;
+		padding: 20px 0;
 		position: relative;
 		transform: translateY(-50px);
 		margin: 0 auto;
@@ -44,8 +43,7 @@ import OnlinePlayers from "./OnlinePlayers.astro";
 	.left,
 	.mid,
 	.right{
-		display: flex;
-		justify-content: center;
+		padding: 20px;
 	}
 
 	.left{
@@ -58,5 +56,11 @@ import OnlinePlayers from "./OnlinePlayers.astro";
 
 	.right{
 		flex: 2;
+	}
+
+	.right-container{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 </style>

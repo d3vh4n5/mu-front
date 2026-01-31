@@ -1,0 +1,138 @@
+---
+import Main from '../../components/Main.astro';
+import Layout from '../../layouts/Layout.astro';
+import { config } from '../../constants/config';
+import { Image } from 'astro:assets';
+import infoImg from '../../assets/img/top-decorator.gif'
+
+const commands = [
+    { "cmd": "/reset", "desc": "Reinicia el personaje" },
+    { "cmd": "/pkclear", "desc": "Quita el estado PK" },
+    { "cmd": "/addstr <pts>", "desc": "Agregar fuerza" },
+    { "cmd": "/addagi <pts>", "desc": "Agregar agilidad" },
+    { "cmd": "/addvit <pts>", "desc": "Agregar vitalidad" },
+    { "cmd": "/addene <pts>", "desc": "Agregar energía" },
+    { "cmd": "/post <msg>", "desc": "Mensaje global" },
+    { "cmd": "/party <msg>", "desc": "Mensaje al party" },
+    { "cmd": "/whisper <msg>", "desc": "Mensaje al jugador" },
+    { "cmd": "/pickset <item>", "desc": "Setea un item para pickear automaticamente. Ej: /pickset Zen" },
+    { "cmd": "/pick on", "desc": "Activa el auto pick" },
+    { "cmd": "/pickclear", "desc": "Limpia todos los pickset que tenes" },
+    { "cmd": "/re auto", "desc": "Aceptar automaticamente las request" },
+    { "cmd": "/re off", "desc": "Desactiva el /re auto" },
+    {
+      cmd: "/attack <on> <buff> <skill>",
+      desc: "Autoataque. Ej: /attack 1 0 61 (activar, sin buff, skill 61)"
+    },
+  ]
+
+---
+
+<Layout>
+	<Main>
+		<div class="container">
+
+			<Image
+				src={infoImg}
+				alt={"Imagen"}
+				class:list={"noticias"}
+			/>
+
+			<h1>Mu manual 📖</h1>
+					
+			<h4>
+				En esta sección veremos comandos y cuestiones importantes para el gameplay.
+			</h4>
+			<p>
+				Tu cuenta permanecera habilitada por 3 dias a partir del momento de creación, luego de ese plazo, podrás jugar en el horario FREE.
+				Para acceder al horario VIP, podrás enviar un sobre con los $5 dentro a nombre de:
+			</p>
+			<h3>Comandos</h3>
+			<p>Los comandos se pueden introducir en el chat del juego para tener distintos efectos dentro del mismo.</p>
+			<p>Puedes realizar todas las acciones necesarias
+				para administrar el personaje (resetear, agregar puntos, borrar PK) directamente con comandos in-game sin necesidad de usar la web.
+			</p>
+			
+	
+      <div class="mu-box">
+        <h3>📜 Comandos del Servidor</h3>
+
+        <table class="mu-table">
+          <thead>
+            <tr>
+              <th>Comando</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {commands.map(command => (
+                <tr>
+                  <td><code>{command.cmd}</code></td>
+                  <td>{command.desc}</td>
+                </tr>
+                ))}
+          </tbody>
+        </table>
+
+      </div>
+      <p>Puedes ver la lista de skills <a href="/help/skills">aquí</a></p>
+    
+    </div>
+
+
+	</Main>
+</Layout>
+<style>
+	.noticias{
+		width: 100%;
+	}
+
+  .mu-box {
+    max-width: 800px;
+    margin: 20px auto;
+    border: 2px solid #b8860b;
+    background: #0e0e0e;
+    color: #f5deb3;
+    box-shadow: 0 0 10px #000;
+  }
+
+  .mu-box h3 {
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    background: linear-gradient(#4b0000, #220000);
+    color: #ffd700;
+    border-bottom: 2px solid #b8860b;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .mu-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .mu-table th {
+    background: #1c1c1c;
+    color: #ffd700;
+    padding: 8px;
+    border-bottom: 1px solid #b8860b;
+  }
+
+  .mu-table td {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+  }
+
+  .mu-table tr:nth-child(odd) {
+    background: #121212;
+  }
+
+  .mu-table tr:nth-child(even) {
+    background: #0a0a0a;
+  }
+
+  .mu-table tr:hover {
+    background: #2a1a00;
+  }
+
+</style>

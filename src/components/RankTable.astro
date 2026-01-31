@@ -16,6 +16,7 @@
 
 <style>
     .ranking-box {
+        width: 100%;
         border: 1px solid currentColor;
     }
 
@@ -25,32 +26,7 @@
         background-color: brown;
         color: bisque;
     }
-    table {
-        text-align: left;
-        border-collapse: collapse;
 
-        tr {
-            background-color: brown;
-            color: bisque;
-        }
-
-        th{
-            padding: 0px 4px;
-        }
-
-        tbody{
-
-            tr:nth-child(odd) {
-                color: brown;
-                background-color: #f9f9f94d;
-            }
-        
-            tr:nth-child(even) {
-                color: brown;
-                background-color: #ffffff62;
-            }
-        }
-    }
 </style>
 
 <script>
@@ -67,7 +43,7 @@ async function loadRankingData() {
         
         tbody.innerHTML = dataRank.map((player: any, index: any) => `
             <tr>
-                <td style="padding: 8px;">${index + 1}</td>
+                <td>${index + 1}</td>
                 <td>${player.Name}</td>
                 <td>${player.cLevel}</td>
                 <td style="color: #d4af37; font-weight: bold;">${player.Resets}</td>

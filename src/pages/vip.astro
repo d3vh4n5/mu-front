@@ -3,10 +3,8 @@ import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
 import { config } from '../constants/config';
 import { Image } from 'astro:assets';
-import img from '../assets/img/Noticias.gif'
+import infoImg from '../assets/img/top-decorator.gif'
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
@@ -14,15 +12,20 @@ import img from '../assets/img/Noticias.gif'
 		<div class="container">
 
 			<Image
-				src={img}
+				src={infoImg}
 				alt={"Imagen"}
 				class:list={"noticias"}
 			/>
 
 			<h1>SOCIO VIP del {config.project.alias}</h1>
-					
+			<h3>Comparacion de cuestiones normales vs VIP</h3>
+			<p>Los usuarios VIP además de tener beneficios, aportan al mantenimiento del proyecto</p>
 			<p>
-				Recuerda que MU COSO es un Server VIP
+				Creemos que el mejor punto medio entre no tener un servidor pay-to-wim y que sea gratuito, es ofrecer un beneficio temporal a travéz del sistema VIP
+			</p>
+			<h3>Como ser VIP</h3>
+			<p>
+				Recuerda que {config.project.alias} es un Server VIP
 			</p>
 			<p>
 				Tu cuenta permanecera habilitada por 3 dias a partir del momento de creación, luego de ese plazo, podrás jugar en el horario FREE.

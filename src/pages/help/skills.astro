@@ -1,0 +1,110 @@
+---
+import Main from '../../components/Main.astro';
+import Layout from '../../layouts/Layout.astro';
+import { config } from '../../constants/config';
+import { Image } from 'astro:assets';
+import infoImg from '../../assets/img/top-decorator.gif'
+
+
+const skills = [
+  { id: 1, name: "Poison" },
+  { id: 2, name: "Meteorite" },
+  { id: 3, name: "Lightning" },
+  { id: 4, name: "Fire Ball" },
+  { id: 5, name: "Flame" },
+  { id: 6, name: "Teleport" },
+  { id: 7, name: "Ice" },
+  { id: 8, name: "Twister" },
+  { id: 9, name: "Evil Spirit" },
+  { id: 10, name: "Hell Fire" },
+  { id: 11, name: "Power Wave" },
+  { id: 12, name: "Aqua Beam" },
+  { id: 13, name: "Blast" },
+  { id: 14, name: "Inferno" },
+  { id: 15, name: "Teleport Party" },
+  { id: 16, name: "Mana Shield" },
+  { id: 17, name: "Energy Ball" },
+  { id: 18, name: "Defense" },
+  { id: 19, name: "Falling Slash" },
+  { id: 20, name: "Lunge" },
+  { id: 21, name: "Uppercut" },
+  { id: 22, name: "Cyclone" },
+  { id: 23, name: "Slash" },
+  { id: 24, name: "Triple Shot" },
+  { id: 26, name: "Heal" },
+  { id: 27, name: "Greater Defense" },
+  { id: 28, name: "Greater Damage" },
+  { id: 30, name: "Summon Goblin" },
+  { id: 31, name: "Summon Stone Golem" },
+  { id: 32, name: "Summon Assassin" },
+  { id: 33, name: "Summon Elite Yeti" },
+  { id: 34, name: "Summon Dark Knight" },
+  { id: 35, name: "Summon Bali" },
+  { id: 36, name: "Summon Soldier" },
+  { id: 38, name: "Decay" },
+  { id: 39, name: "Ice Storm" },
+  { id: 40, name: "Nova" },
+  { id: 41, name: "Twisting Slash" },
+  { id: 42, name: "Rageful Blow" },
+  { id: 43, name: "Death Stab" },
+  { id: 47, name: "Impale" },
+  { id: 48, name: "Greater Life" },
+  { id: 49, name: "Fire Breath" },
+  { id: 50, name: "Monster Area Attack" },
+  { id: 51, name: "Ice Arrow" },
+  { id: 52, name: "Penetration" },
+  { id: 55, name: "Fire Slash" },
+  { id: 56, name: "Power Slash" },
+  { id: 60, name: "Force" },
+  { id: 61, name: "Fire Burst" },
+  { id: 62, name: "Earthquake" },
+  { id: 63, name: "Summon Party" },
+  { id: 64, name: "Greater Critical Damage" },
+  { id: 65, name: "Electric Spark" },
+  { id: 66, name: "Force Wave" },
+  { id: 200, name: "Monster Summon" },
+  { id: 201, name: "Magic Damage Immunity" },
+  { id: 202, name: "Physi Damage Immunity" }
+];
+
+---
+
+<Layout>
+	<Main>
+		<div class="container">
+
+			<Image
+				src={infoImg}
+				alt={"Imagen"}
+				class:list={"noticias"}
+			/>
+
+			<h1>Skill list ⚔️</h1>
+
+			<table class="skills-table">
+				<thead>
+					<tr>
+					<th>ID</th>
+					<th>Skill</th>
+					</tr>
+				</thead>
+				<tbody>
+					{skills.map(skill => (
+					<tr>
+						<td>{skill.id}</td>
+						<td>{skill.name}</td>
+					</tr>
+					))}
+				</tbody>
+			</table>
+
+		</div>
+
+
+	</Main>
+</Layout>
+<style>
+	.noticias{
+		width: 100%;
+	}
+</style>

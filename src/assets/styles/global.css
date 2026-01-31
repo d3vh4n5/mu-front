@@ -7,3 +7,44 @@
     --max-w: 800px;
     --bg: #000413;
 }
+
+h3 {
+    margin: 20px 0;
+    padding: 6px;
+    text-align: center;
+    background-color: brown;
+    color: bisque;
+}
+
+table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+
+    tr {
+        background-color: brown;
+        color: bisque;
+    }
+
+    th{
+        padding: 0px 4px;
+    }
+
+    tbody{
+
+        tr:nth-child(odd) {
+            color: brown;
+            background-color: #f9f9f94d;
+        }
+    
+        tr:nth-child(even) {
+            color: brown;
+            background-color: #ffffff62;
+        }
+    }
+
+    td, th{
+        padding: 6px;
+    }
+    
+}
