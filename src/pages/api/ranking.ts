@@ -1,12 +1,15 @@
 import type { APIRoute } from 'astro';
 import { config } from '../../constants/config';
 
+export const prerender = false;
+export const runtime = 'nodejs';
+
 export const GET: APIRoute = async () => {
   try {
     const res = await fetch(config.apiUrl + '/api/ranking',{
       cache: 'no-store'
     });
-    
+
     const data = await res.json();
 
     return new Response(JSON.stringify(data), {
