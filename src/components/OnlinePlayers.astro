@@ -1,12 +1,12 @@
 <div id="server-status">
-    Estado: <span id="status-dot" style="color: #2ecc71;">●</span> 
-    Online: <span id="user-count">0</span>
+    Server: <span id="status-dot">●</span> 
+    <span id="status">Conectando...</span> <span id="user-count"></span>
 </div>
 
 <style>
     #server-status{
         padding: 8px 0;
-        border: 1px solid #2ecc71;
+        border: 1px solid currentColor;
         text-align: center;
         margin: 20px 0;
     }
@@ -17,23 +17,74 @@
 </style>
 
 <script>
-// import { config } from '../constants/config.ts';
+interface ServerStatusResponse {
+    online: number;
+}
 
-async function loadServerData() {
+const statusBox = document.getElementById('server-status') as HTMLDivElement | null;
+const status = document.getElementById('status') as HTMLDivElement | null;
+const statusDot = document.getElementById('status-dot') as HTMLSpanElement | null;
+const userCount = document.getElementById('user-count') as HTMLSpanElement | null;
+
+if (!statusBox || !status || !statusDot || !userCount) {
+    throw new Error('Elementos del DOM no encontrados');
+}
+
+const COLORS = {
+    online: '#2ecc71',
+    offline: '#e74c3c'
+} as const;
+
+function setOnline(users: number): void {
+    if (!statusBox || !status || !statusDot || !userCount) {
+        throw new Error('Elementos del DOM no encontrados');
+    }
+    status.innerText = "Online:"
+    statusDot.style.color = COLORS.online;
+    statusBox.style.borderColor = COLORS.online;
+    userCount.innerText = users.toString();
+}
+
+function setOffline(): void {
+    if (!statusBox || !status || !statusDot || !userCount) {
+        throw new Error('Elementos del DOM no encontrados');
+    }
+
+    status.innerText = "Offline"
+    statusDot.style.color = COLORS.offline;
+    statusBox.style.borderColor = COLORS.offline;
+    userCount.innerText = "";
+}
+
+async function loadServerData(): Promise<void> {
     try {
-        // Cargar Status
-        const resStatus = await fetch('/api/status');
-        const dataStatus = await resStatus.json();
-        const $userCount = document.getElementById('user-count');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-        if (!$userCount) return 
+        const response = await fetch('/api/status', {
+            signal: controller.signal
+        });
 
-        $userCount.innerText = dataStatus.online;
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data: ServerStatusResponse = await response.json();
+
+        if (typeof data.online !== 'number') {
+            throw new Error('Formato de respuesta inválido');
+        }
+
+        setOnline(data.online);
     } catch (error) {
-        console.error("Error cargando datos del servidor", error);
+        console.error('Servidor OFFLINE', error);
+        setOffline();
     }
 }
 
 loadServerData();
 setInterval(loadServerData, 30000);
+
 </script>

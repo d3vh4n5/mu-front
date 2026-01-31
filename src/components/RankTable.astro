@@ -27,9 +27,29 @@
     }
     table {
         text-align: left;
-    }
-    thead tr {
+        border-collapse: collapse;
+
+        tr {
+            background-color: brown;
+            color: bisque;
+        }
+
+        th{
+            padding: 0px 4px;
+        }
+
+        tbody{
+
+            tr:nth-child(odd) {
+                color: brown;
+                background-color: #f9f9f94d;
+            }
         
+            tr:nth-child(even) {
+                color: brown;
+                background-color: #ffffff62;
+            }
+        }
     }
 </style>
 
@@ -46,7 +66,7 @@ async function loadRankingData() {
         if (!tbody) return;
         
         tbody.innerHTML = dataRank.map((player: any, index: any) => `
-            <tr style="border-bottom: 1px solid #222;">
+            <tr>
                 <td style="padding: 8px;">${index + 1}</td>
                 <td>${player.Name}</td>
                 <td>${player.cLevel}</td>
