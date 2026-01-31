@@ -3,7 +3,10 @@ import { config } from '../../constants/config';
 
 export const GET: APIRoute = async () => {
   try {
-    const res = await fetch(config.apiUrl + '/api/ranking');
+    const res = await fetch(config.apiUrl + '/api/ranking',{
+      cache: 'no-store'
+    });
+    
     const data = await res.json();
 
     return new Response(JSON.stringify(data), {

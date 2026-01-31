@@ -46,5 +46,7 @@ table {
     td, th{
         padding: 6px;
     }
-    
+
 }
+.error { color: #ff4d4d !important; }
+.success { color: #2ecc71 !important; }
