@@ -34,12 +34,12 @@
 </style>
 
 <script>
-import { config } from '../constants/config.ts';
+// import { config } from '../constants/config.ts';
 
 async function loadRankingData() {
     try {
 
-        const resRank = await fetch(config.apiUrl + '/api/ranking');
+        const resRank = await fetch('/api/ranking');
         const dataRank = await resRank.json();
         const tbody = document.getElementById('ranking-body') as HTMLTableSectionElement | null;
 
