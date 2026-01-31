@@ -1,0 +1,39 @@
+<div id="server-status">
+    Estado: <span id="status-dot" style="color: #2ecc71;">●</span> 
+    Online: <span id="user-count">0</span>
+</div>
+
+<style>
+    #server-status{
+        padding: 8px 0;
+        border: 1px solid #2ecc71;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    #user-count{
+        font-weight: 800;
+    }
+</style>
+
+<script>
+import { config } from '../constants/config.ts';
+
+async function loadServerData() {
+    try {
+        // Cargar Status
+        const resStatus = await fetch(config.apiUrl + '/api/status');
+        const dataStatus = await resStatus.json();
+        const $userCount = document.getElementById('user-count');
+
+        if (!$userCount) return 
+
+        $userCount.innerText = dataStatus.online;
+    } catch (error) {
+        console.error("Error cargando datos del servidor", error);
+    }
+}
+
+loadServerData();
+setInterval(loadServerData, 30000);
+</script>

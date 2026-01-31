@@ -1,11 +1,81 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
+import { config } from '../constants/config';
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+	<Main>
+		<section>
+
+			<h1>Bienvenidos a {config.project.alias}</h1>
+
+			<div class="welcomeMessage">
+				<p class="subtitle">
+					MU Online {config.server.version} • Experiencia equilibrada • Sin pay-to-win
+				</p>
+
+				<div class="cta">
+					<a href="/downloads" class="btn primary">Descargar cliente</a>
+					<a href="/register" class="btn">Crear cuenta</a>
+				</div>
+			</div>
+	
+			<h3>Noticias</h3>
+			<p>
+				El servidor aun se encuentra en desarrollo, abrirá oficialmente el <strong>XX-XX</strong>
+			</p>
+			
+			<h3>Info del Server</h3>
+			<ul class="server-info">
+				<li><strong>Versión:</strong> 99b + DL</li>
+				<li><strong>Experiencia:</strong> x100</li>
+				<li><strong>Drop:</strong> 40%</li>
+				<li><strong>Reset:</strong> 400 puntos (borra stats)</li>
+				<li><strong>Máx resets:</strong> 300</li>
+				<li><strong>Máx stats:</strong> 32767</li>
+				<li><strong>Eventos:</strong> BC, DS, CC, Invasiones</li>
+				<li><strong>Comandos:</strong> Restea y agrega puntos sin salir del juego</li>
+			</ul>
+
+			<h3>Nuestro staff</h3>
+			<ul class="server-info">
+				<li><strong>Mack:</strong> Eventos y GX</li>
+				<li><strong>Cosito:</strong> Game Experience</li>
+				<li><strong>Hanster:</strong> Atencion de bugs y errores de sistema</li>
+				<li><strong>Calab0y:</strong> Atencion de bugs y errores de sistema</li>
+			</ul>
+		</section>
+	</Main>
 </Layout>
+
+<style>
+	h1{
+		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	}
+	.btn {
+		border-radius: 5px;
+		padding: 8px 16px;
+		background-color: #2e53cc;
+		text-decoration: none;
+		display: inline-block;
+		color: rgb(207, 247, 250);
+		font-weight: 600;
+
+		&:hover{
+			background-color: #345de6;
+		}
+	}
+
+	.primary{
+		background-color: #2ecc71;
+		color: rgb(7, 44, 0);
+
+		&:hover{
+			background-color: #34e67e;
+		}
+	}
+</style>

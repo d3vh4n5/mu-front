@@ -1,0 +1,66 @@
+<div class="ranking-box">
+    <h3 >TOP 10 GUERREROS</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Nivel</th>
+                <th>Resets</th>
+            </tr>
+        </thead>
+        <tbody id="ranking-body">
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .ranking-box {
+        border: 1px solid currentColor;
+    }
+
+    h3{
+        margin: 0;
+        text-align: center;
+        background-color: brown;
+        color: bisque;
+    }
+    table {
+        text-align: left;
+    }
+    thead tr {
+        
+    }
+</style>
+
+<script>
+import { config } from '../constants/config.ts';
+
+async function loadRankingData() {
+    try {
+
+        const resRank = await fetch(config.apiUrl + '/api/ranking');
+        const dataRank = await resRank.json();
+        const tbody = document.getElementById('ranking-body') as HTMLTableSectionElement | null;
+
+        if (!tbody) return;
+        
+        tbody.innerHTML = dataRank.map((player: any, index: any) => `
+            <tr style="border-bottom: 1px solid #222;">
+                <td style="padding: 8px;">${index + 1}</td>
+                <td>${player.Name}</td>
+                <td>${player.cLevel}</td>
+                <td style="color: #d4af37; font-weight: bold;">${player.Resets}</td>
+            </tr>
+        `).join('');
+
+    } catch (error) {
+        console.error("Error cargando datos del servidor", error);
+    }
+}
+
+loadRankingData();
+setInterval(loadRankingData, 30000);
+
+
+</script>
