@@ -5,15 +5,18 @@ import { config } from '../constants/config';
 import { Image } from 'astro:assets';
 import infoImg from '../assets/img/top-decorator.gif'
 
-const vipBenefits = [
-	{
-		label: "Sour Rate (%)",
-		al0: 50,
-		al1: 55,
-		al2: 60,
-		al3: 75,
-	}
-]
+const tiers = ["FREE", "VIP 1", "VIP 2", "VIP 3"];
+const rows = [
+  { group: "General", label: "Experiencia", values: ["100%", "120%", "130%", "150%"] },
+  { group: "General", label: "Drop Items", values: ["40%", "50%", "60%", "70%"] },
+  { group: "Resets", label: "Nivel Reset", values: ["400", "390", "370", "350"] },
+  { group: "Resets", label: "Puntos por Reset", values: ["400", "500", "600", "800"] },
+  { group: "Joyas", label: "Soul Success", values: ["50%", "55%", "60%", "75%"] },
+  { group: "Joyas", label: "Life Success", values: ["50%", "55%", "60%", "75%"] },
+  { group: "Chaos Mix", label: "Item +10 / +11", values: ["60%", "65%", "70%", "75%"] },
+  { group: "Chaos Mix", label: "Item +12 / +13", values: ["50%", "55%", "60%", "65%"] },
+  { group: "Chaos Mix", label: "Dinorant / Pets", values: ["70%", "75%", "80%", "85%"] },
+];
 ---
 
 <Layout>
@@ -33,103 +36,42 @@ const vipBenefits = [
 				Creemos que el mejor punto medio entre no tener un servidor pay-to-wim y que sea gratuito, es ofrecer un beneficio temporal a travéz del sistema VIP
 			</p>
 			<h3>Como ser VIP</h3>
-			<p>
+			<!-- <p>
 				Recuerda que {config.project.alias} es un Server VIP
 			</p>
 			<p>
 				Tu cuenta permanecera habilitada por 3 dias a partir del momento de creación, luego de ese plazo, podrás jugar en el horario FREE.
 				Para acceder al horario VIP, podrás enviar un sobre con los $5 dentro a nombre de:
-			</p>
+			</p> -->
+
 			<p>
-				SoulSuccessRate_AL0 = 50
-				SoulSuccessRate_AL1 = 55
-				SoulSuccessRate_AL2 = 60
-				SoulSuccessRate_AL3 = 75
-
-				LifeSuccessRate_AL0 = 50
-				LifeSuccessRate_AL1 = 55
-				LifeSuccessRate_AL2 = 60
-				LifeSuccessRate_AL3 = 75
+				Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat quisquam impedit similique mollitia tempora sunt libero eaque natus officia vel rerum totam dolorum earum consequuntur praesentium omnis repellendus culpa atque aperiam tempore corrupti architecto distinctio, optio consectetur. Alias quasi consequuntur commodi ipsum quos ducimus est quaerat molestias repudiandae cumque! Quod!
 			</p>
-			<p>
-				CommandPKClearMoney_AL0 = 5000000   ; No VIP
-				CommandPKClearMoney_AL1 = 3000000
-				CommandPKClearMoney_AL2 = 1500000
-				CommandPKClearMoney_AL3 = 500000    ; VIP alto
 
-				CommandWareNumber_AL3 = 1 no anda
-
-				CommandResetLevel_AL0 = 400
-				CommandResetLevel_AL1 = 390
-				CommandResetLevel_AL2 = 370
-				CommandResetLevel_AL3 = 350
-				CommandResetMoney_AL0 = 5000000
-				CommandResetMoney_AL1 = 4000000
-				CommandResetMoney_AL2 = 3000000
-				CommandResetMoney_AL3 = 1000000
-
-				CommandResetPoint_AL0 = 400
-				CommandResetPoint_AL1 = 500
-				CommandResetPoint_AL2 = 600
-				CommandResetPoint_AL3 = 800
-			</p>
-			<p>
-				;==================================================
-				; Plus Item Level 10 Mix Settings
-				;==================================================
-				PlusCommonItemLevelMixRate1_AL0 = 60
-				PlusCommonItemLevelMixRate1_AL1 = 60
-				PlusCommonItemLevelMixRate1_AL2 = 60
-				PlusCommonItemLevelMixRate1_AL3 = 80
-				PlusExcSetItemLevelMixRate1_AL0 = 60
-				PlusExcSetItemLevelMixRate1_AL1 = 60
-				PlusExcSetItemLevelMixRate1_AL2 = 60
-				PlusExcSetItemLevelMixRate1_AL3 = 80
-
-				;==================================================
-				; Plus Item Level 11 Mix Settings
-				;==================================================
-				PlusCommonItemLevelMixRate2_AL0 = 60
-				PlusCommonItemLevelMixRate2_AL1 = 60
-				PlusCommonItemLevelMixRate2_AL2 = 60
-				PlusCommonItemLevelMixRate2_AL3 = 80
-				PlusExcSetItemLevelMixRate2_AL0 = 60
-				PlusExcSetItemLevelMixRate2_AL1 = 60
-				PlusExcSetItemLevelMixRate2_AL2 = 60
-				PlusExcSetItemLevelMixRate2_AL3 = 80
-
-				;==================================================
-				; Plus Item Level 12 Mix Settings
-				;==================================================
-				PlusCommonItemLevelMixRate3_AL0 = 50
-				PlusCommonItemLevelMixRate3_AL1 = 50
-				PlusCommonItemLevelMixRate3_AL2 = 50
-				PlusCommonItemLevelMixRate3_AL3 = 70
-				PlusExcSetItemLevelMixRate3_AL0 = 50
-				PlusExcSetItemLevelMixRate3_AL1 = 50
-				PlusExcSetItemLevelMixRate3_AL2 = 50
-				PlusExcSetItemLevelMixRate3_AL3 = 70
-
-				;==================================================
-				; Plus Item Level 13 Mix Settings
-				;==================================================
-				PlusCommonItemLevelMixRate4_AL0 = 50
-				PlusCommonItemLevelMixRate4_AL1 = 50
-				PlusCommonItemLevelMixRate4_AL2 = 50
-				PlusCommonItemLevelMixRate4_AL3 = 70
-				PlusExcSetItemLevelMixRate4_AL0 = 50
-				PlusExcSetItemLevelMixRate4_AL1 = 50
-				PlusExcSetItemLevelMixRate4_AL2 = 50
-				PlusExcSetItemLevelMixRate4_AL3 = 70
-
-				;==================================================
-				; Dinorant Mix Settings
-				;==================================================
-				DinorantMixRate_AL0 = 70
-				DinorantMixRate_AL1 = 70
-				DinorantMixRate_AL2 = 70
-				DinorantMixRate_AL3 = 80
-			</p>
+			<div>
+				<table>
+					<thead>
+					<tr>
+						<th>Categoría</th>
+						<th>Beneficio</th>
+						{tiers.map(t => <th>{t}</th>)}
+					</tr>
+					</thead>
+					<tbody>
+					{rows.map((row) => (
+						<tr>
+						<td>{row.group}</td>
+						<td>{row.label}</td>
+						{row.values.map((val, i) => (
+							<td>
+							{val}
+							</td>
+						))}
+						</tr>
+					))}
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 

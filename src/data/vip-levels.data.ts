@@ -1,0 +1,38 @@
+const vipLevels = [
+  {
+    soul: 50,
+    life: 50,
+    pk: 5000000,
+    resetLevel: 400,
+    resetPoints: 400,
+    plus: 50,
+    dinorant: 70,
+  },
+  {
+    soul: 55,
+    life: 55,
+    pk: 3000000,
+    resetLevel: 390,
+    resetPoints: 500,
+    plus: 60,
+    dinorant: 70,
+  },
+  {
+    soul: 60,
+    life: 60,
+    pk: 1500000,
+    resetLevel: 370,
+    resetPoints: 600,
+    plus: 60,
+    dinorant: 70,
+  },
+  {
+    soul: 75,
+    life: 75,
+    pk: 500000,
+    resetLevel: 350,
+    resetPoints: 800,
+    plus: 80,
+    dinorant: 80,
+  },
+];
