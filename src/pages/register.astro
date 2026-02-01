@@ -36,6 +36,9 @@ import { Image } from 'astro:assets';
 						<label>Correo Electrónico (Debe ser real para poder verificar la cuenta)</label>
 						<input type="email" id="email" required>
 					</div>
+					<p>
+						Al registrarse en este server, ser compromete a respetar el reglamento y acepta los terminos y condiciones
+					</p>
 					<button type="submit">CREAR CUENTA</button>
 				</form>
 			</section>
@@ -110,7 +113,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 	};
 
 	try {
-		const response = await fetch(config.apiUrl + '/register', {
+		const response = await fetch('/api/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(data)
@@ -125,6 +128,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 			msgDiv.innerHTML = `<span class="error">${result.error}</span>`;
 		}
 	} catch (error) {
+		console.error(error)
 		msgDiv.innerHTML = `<span class="error">No se pudo conectar con la API</span>`;
 	}
 });
