@@ -7,7 +7,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
 
     // Reenvío al API real
-    const response = await fetch(`${config.apiUrl}/register`, {
+    const response = await fetch(`${config.apiUrl}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
