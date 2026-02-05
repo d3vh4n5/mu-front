@@ -9,10 +9,14 @@ export const GET: APIRoute = async () => {
     const res = await fetch(config.apiUrl + '/api/status', {
       cache: 'no-store'
     });
+    const response2 = await fetch(config.apiUrl + '/health/readiness', {
+      cache: 'no-store'
+    });
 
     const data = await res.json();
+    const data2 = await response2.json();
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify({...data, ...data2}), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

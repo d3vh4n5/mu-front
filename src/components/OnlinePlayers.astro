@@ -20,6 +20,12 @@
 <script>
 interface ServerStatusResponse {
     online: number;
+    muServer: {
+        connectServer: string,
+        joinServer: string,
+        gameServer: string,
+        dataServer: string,
+    }
 }
 
 const statusBox = document.getElementById('server-status') as HTMLDivElement | null;
@@ -77,6 +83,13 @@ async function loadServerData(): Promise<void> {
         if (typeof data.online !== 'number') {
             throw new Error('Formato de respuesta inválido');
         }
+
+        if (
+            data.muServer.connectServer != 'running' ||
+            data.muServer.joinServer != 'running' ||
+            data.muServer.gameServer != 'running' ||
+            data.muServer.dataServer != 'running'
+        ) throw new Error('One or more server services are broken')
 
         setOnline(data.online);
     } catch (error) {
