@@ -7,10 +7,18 @@ export const runtime = 'nodejs';
 export const GET: APIRoute = async () => {
   try {
     const res = await fetch(config.apiUrl + '/api/status', {
-      cache: 'no-store'
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.SECRET_API_KEY || 'secret',
+      },
     });
     const response2 = await fetch(config.apiUrl + '/health/readiness', {
-      cache: 'no-store'
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.SECRET_API_KEY || 'secret',
+      },
     });
 
     const data = await res.json();

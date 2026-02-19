@@ -9,13 +9,14 @@ export const POST: APIRoute = async ({ request }) => {
     // Reenvío al API real
     const response = await fetch(`${config.apiUrl}/api/auth/register`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.SECRET_API_KEY || 'secret',
+      },
       body: JSON.stringify(body),
     });
 
     const result = await response.json();
-
-    console.log(result)
 
     return new Response(JSON.stringify(result), {
       status: response.status,
