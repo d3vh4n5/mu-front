@@ -1,33 +1,13 @@
-<div class="ranking-box">
-    <h3 >TOP 10 GUERREROS</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Nivel</th>
-                <th>Resets</th>
-            </tr>
-        </thead>
-        <tbody id="ranking-body">
-        </tbody>
-    </table>
-</div>
+---
+import MuTable from "./MuTable.astro";
+---
 
-<style>
-    .ranking-box {
-        width: 100%;
-        border: 1px solid currentColor;
-    }
-
-    h3{
-        margin: 0;
-        text-align: center;
-        background-color: brown;
-        color: bisque;
-    }
-
-</style>
+<MuTable
+  id="ranking-body"
+  title="TOP 10 GUERREROS"
+  columns={["#", "Nombre", "Nivel", "Resets"]}
+  data={[]}
+/>
 
 <script>
 // import { config } from '../constants/config.ts';

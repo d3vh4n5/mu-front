@@ -2,6 +2,7 @@
 import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
 import { config } from '../constants/config';
+import Text from '../components/ui/Text.astro';
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
@@ -11,7 +12,7 @@ import { config } from '../constants/config';
 	<Main>
 		<section>
 
-			<h1>Bienvenidos a {config.project.alias}</h1>
+			<h1 class="gradient-text-cold">Bienvenidos a {config.project.alias}</h1>
 
 			<div class="welcomeMessage">
 				<p class="subtitle">
@@ -26,20 +27,24 @@ import { config } from '../constants/config';
 	
 			<h3>Noticias</h3>
 			<marquee>
-				El servidor aun se encuentra en desarrollo, abrirá oficialmente el <strong>XX-XX</strong>
+				<Text>
+					El servidor aun se encuentra en desarrollo, abrirá oficialmente el <strong>XX-XX</strong>
+				</Text>
 			</marquee>
 			
 			<h3>Info del Server</h3>
-			<ul class="server-info">
-				<li><strong>Versión:</strong> 99b + DL</li>
-				<li><strong>Experiencia:</strong> x100</li>
-				<li><strong>Drop:</strong> 40%</li>
-				<li><strong>Reset:</strong> 400 puntos (borra stats)</li>
-				<li><strong>Máx resets:</strong> 300</li>
-				<li><strong>Máx stats:</strong> 32767</li>
-				<li><strong>Eventos:</strong> BC, DS, CC, Invasiones</li>
-				<li><strong>Comandos:</strong> Restea y agrega puntos sin salir del juego</li>
-			</ul>
+			<Text>
+				<ul class="server-info">
+					<li><strong>Versión:</strong> 99b + DL</li>
+					<li><strong>Experiencia:</strong> x100</li>
+					<li><strong>Drop:</strong> 40%</li>
+					<li><strong>Reset:</strong> 400 puntos (borra stats)</li>
+					<li><strong>Máx resets:</strong> 300</li>
+					<li><strong>Máx stats:</strong> 32767</li>
+					<li><strong>Eventos:</strong> BC, DS, CC, Invasiones</li>
+					<li><strong>Comandos:</strong> Restea y agrega puntos sin salir del juego</li>
+				</ul>
+			</Text>
 
 			<h3>Nuestro staff</h3>
 			<ul class="server-info">
@@ -55,27 +60,5 @@ import { config } from '../constants/config';
 <style>
 	h1{
 		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-	}
-	.btn {
-		border-radius: 5px;
-		padding: 8px 16px;
-		background-color: #2e53cc;
-		text-decoration: none;
-		display: inline-block;
-		color: rgb(207, 247, 250);
-		font-weight: 600;
-
-		&:hover{
-			background-color: #345de6;
-		}
-	}
-
-	.primary{
-		background-color: #2ecc71;
-		color: rgb(7, 44, 0);
-
-		&:hover{
-			background-color: #34e67e;
-		}
 	}
 </style>

@@ -1,26 +1,33 @@
 ---
-const { title, columns, data } = Astro.props
+interface Props {
+  title: string,
+  columns: string[],
+  data: (string | number)[][]
+  id?: string
+}
+
+const { title, columns, data, id } = Astro.props
 
 ---
 
 <div class="mu-box">
   {title && <h3>{title}</h3>}
 
-  <table>
+  <table class="mu-table">
     <thead>
       <tr>
         {columns.map(col => (
-          <th>{col.header}</th>
+          <th>{col}</th>
         ))}
       </tr>
     </thead>
 
-    <tbody>
-      {data.map((row, i) => (
+    <tbody id={id}>
+      {data.map((row) => (
         <tr>
-          {columns.map(col => (
-            <td class={col.className}>
-              {row[col.key]}
+          {row.map((col) => (
+            <td>
+              {col}
             </td>
           ))}
         </tr>
@@ -29,46 +36,52 @@ const { title, columns, data } = Astro.props
   </table>
 </div>
 
-<style>
-  .mu-box {
-    border: 1px solid #b89b5e;
-    background: #111;
-    color: #e6d8b5;
-    width: 100%;
-  }
-
-  h3 {
-    margin: 0;
-    padding: 8px;
-    text-align: center;
-    background: linear-gradient(#5a1c1c, #2a0d0d);
+<style is:global>
+ .mu-box {
+    max-width: 800px;
+    margin: 20px auto;
+    border: 2px solid var(--color-danger);
+    background: #0e0e0e;
     color: #f5deb3;
-    font-weight: bold;
-    border-bottom: 1px solid #b89b5e;
+    box-shadow: 0 0 10px #000;
   }
 
-  table {
+  .mu-box h3 {
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    background: linear-gradient(#4b0000, #220000);
+    color: var(--color-danger);
+    border-bottom: 2px solid var(--color-danger);
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  .mu-table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  thead {
+  .mu-table th {
     background: #1c1c1c;
+    color: var(--color-danger);
+    padding: 8px;
+    border-bottom: 1px solid var(--color-danger);
   }
 
-  th, td {
-    padding: 6px 8px;
+  .mu-table td {
+    padding: 8px;
+    border-bottom: 1px solid #333;
   }
 
-  tbody tr:nth-child(odd) {
-    background: #151515;
+  .mu-table tr:nth-child(odd) {
+    background: #121212;
   }
 
-  tbody tr:nth-child(even) {
-    background: #0f0f0f;
+  .mu-table tr:nth-child(even) {
+    background: #0a0a0a;
   }
 
-  tbody tr:hover {
-    background: #2a1a0a;
+  .mu-table tr:hover {
+    background: #2a1a00;
   }
 </style>

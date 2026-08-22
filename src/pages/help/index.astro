@@ -1,31 +1,30 @@
 ---
 import Main from '../../components/Main.astro';
 import Layout from '../../layouts/Layout.astro';
-import { config } from '../../constants/config';
+import MuTable from '../../components/MuTable.astro';
 import { Image } from 'astro:assets';
 import infoImg from '../../assets/img/top-decorator.gif'
 
+const title = "📜 Comandos del Servidor"
+const columns = ["Comando", "Descripción"]
 const commands = [
-    { "cmd": "/reset", "desc": "Reinicia el personaje" },
-    { "cmd": "/pkclear", "desc": "Quita el estado PK" },
-    { "cmd": "/addstr <pts>", "desc": "Agregar fuerza" },
-    { "cmd": "/addagi <pts>", "desc": "Agregar agilidad" },
-    { "cmd": "/addvit <pts>", "desc": "Agregar vitalidad" },
-    { "cmd": "/addene <pts>", "desc": "Agregar energía" },
-    { "cmd": "/addcmd <pts>", "desc": "Agregar comando (DL)" },
-    { "cmd": "/post <msg>", "desc": "Mensaje global" },
-    { "cmd": "/party <msg>", "desc": "Mensaje al party" },
-    { "cmd": "/whisper <msg>", "desc": "Mensaje al jugador" },
-    { "cmd": "/pickset <item>", "desc": "Setea un item para pickear automaticamente. Ej: /pickset Zen" },
-    { "cmd": "/pick on", "desc": "Activa el auto pick" },
-    { "cmd": "/pickclear", "desc": "Limpia todos los pickset que tenes" },
-    { "cmd": "/re auto", "desc": "Aceptar automaticamente las request" },
-    { "cmd": "/re off", "desc": "Desactiva el /re auto" },
-    { "cmd": "/<num> /<comando y/o opciones>", "desc": "Se usa para crear macros que luego se activan usando alt + <num>" },
-    {
-      cmd: "/attack <on> <buff> <skill>",
-      desc: "Autoataque. Ej: /attack 1 0 61 (activar, sin buff, skill 61)"
-    },
+    ["/reset", "Reinicia el personaje" ],
+    ["/pkclear", "Quita el estado PK" ],
+    ["/addstr <pts>", "Agregar fuerza" ],
+    ["/addagi <pts>", "Agregar agilidad" ],
+    ["/addvit <pts>", "Agregar vitalidad" ],
+    ["/addene <pts>", "Agregar energía" ],
+    ["/addcmd <pts>", "Agregar comando (DL)" ],
+    ["/post <msg>", "Mensaje global" ],
+    ["/party <msg>", "Mensaje al party" ],
+    ["/whisper <msg>", "Mensaje al jugador" ],
+    ["/pickset <item>", "Setea un item para pickear automaticamente. Ej: /pickset Zen" ],
+    ["/pick on", "Activa el auto pick" ],
+    ["/pickclear", "Limpia todos los pickset que tenes" ],
+    ["/re auto", "Aceptar automaticamente las request" ],
+    ["/re off", "Desactiva el /re auto" ],
+    ["/<num> /<comando y/o opciones>", "Se usa para crear macros que luego se activan usando alt + <num>" ],
+    ["/attack <on> <buff> <skill>", "Autoataque. Ej: /attack 1 0 61 (activar, sin buff, skill 61)"],
   ]
 
 ---
@@ -55,28 +54,12 @@ const commands = [
 				para administrar el personaje (resetear, agregar puntos, borrar PK) directamente con comandos in-game sin necesidad de usar la web.
 			</p>
 			
-	
-      <div class="mu-box">
-        <h3>📜 Comandos del Servidor</h3>
+      <MuTable 
+        title={title}
+        columns={columns}
+        data={commands}
+      />
 
-        <table class="mu-table">
-          <thead>
-            <tr>
-              <th>Comando</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {commands.map(command => (
-                <tr>
-                  <td><code>{command.cmd}</code></td>
-                  <td>{command.desc}</td>
-                </tr>
-                ))}
-          </tbody>
-        </table>
-
-      </div>
       <p>Puedes ver la lista de skills <a href="/help/skills">aquí</a></p>
     
     </div>
@@ -88,53 +71,5 @@ const commands = [
 	.noticias{
 		width: 100%;
 	}
-
-  .mu-box {
-    max-width: 800px;
-    margin: 20px auto;
-    border: 2px solid #b8860b;
-    background: #0e0e0e;
-    color: #f5deb3;
-    box-shadow: 0 0 10px #000;
-  }
-
-  .mu-box h3 {
-    margin: 0;
-    padding: 10px;
-    text-align: center;
-    background: linear-gradient(#4b0000, #220000);
-    color: #ffd700;
-    border-bottom: 2px solid #b8860b;
-    text-shadow: 1px 1px 2px #000;
-  }
-
-  .mu-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .mu-table th {
-    background: #1c1c1c;
-    color: #ffd700;
-    padding: 8px;
-    border-bottom: 1px solid #b8860b;
-  }
-
-  .mu-table td {
-    padding: 8px;
-    border-bottom: 1px solid #333;
-  }
-
-  .mu-table tr:nth-child(odd) {
-    background: #121212;
-  }
-
-  .mu-table tr:nth-child(even) {
-    background: #0a0a0a;
-  }
-
-  .mu-table tr:hover {
-    background: #2a1a00;
-  }
 
 </style>

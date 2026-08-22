@@ -9,6 +9,5 @@ export const config = {
     },
     server: {
         version: "99b + DL"
-    },
-    apiUrl: "http://93.127.142.139"
+    }
 }

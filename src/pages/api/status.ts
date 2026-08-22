@@ -1,23 +1,23 @@
 import type { APIRoute } from 'astro';
-import { config } from '../../constants/config';
+import { apiKey, apiUrl } from './config/config';
 
 export const prerender = false;
 export const runtime = 'nodejs';
 
 export const GET: APIRoute = async () => {
   try {
-    const res = await fetch(config.apiUrl + '/api/status', {
+    const res = await fetch(apiUrl + '/api/status', {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': import.meta.env.SECRET_API_KEY || 'secret',
+        'x-api-key': apiKey,
       },
     });
-    const response2 = await fetch(config.apiUrl + '/health/readiness', {
+    const response2 = await fetch(apiUrl + '/health/readiness', {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': import.meta.env.SECRET_API_KEY || 'secret',
+        'x-api-key': apiKey,
       },
     });
 

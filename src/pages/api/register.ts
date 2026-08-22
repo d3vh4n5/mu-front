@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { config } from '../../constants/config'; // tu config con apiUrl
+import { apiKey, apiUrl } from './config/config';
 
 export const POST: APIRoute = async ({ request }) => {
     console.log("se esta llamando aca")
@@ -7,11 +8,11 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
 
     // Reenvío al API real
-    const response = await fetch(`${config.apiUrl}/api/auth/register`, {
+    const response = await fetch(`${apiUrl}/api/auth/register`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'x-api-key': import.meta.env.SECRET_API_KEY || 'secret',
+        'x-api-key': apiKey,
       },
       body: JSON.stringify(body),
     });

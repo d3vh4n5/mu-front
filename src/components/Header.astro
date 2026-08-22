@@ -12,7 +12,7 @@ const pages = [
 ---
 
 <header>
-    <nav>
+    <nav class="bg-blur">
         <ul>
             {
                 pages.map( page => (<li>
@@ -40,7 +40,7 @@ const pages = [
         width: 100%;
         max-width: var(--max-w);
         padding: 8px 16px;
-        background-color: rgba(0, 0, 0, 0.432);
+        border-radius: 0px 0px 5px 5px;
         z-index: 10;
     }
     ul{
@@ -56,13 +56,13 @@ const pages = [
 
     a{
         text-decoration: none;
-        color: bisque;
+        color: var(--fg);
     }
 
     .container {
         margin: 0 auto;
         width: 100%;
-        height: 40vh;
+        height: 50vh;
         max-width: 1300px;
     }
     .hero-img {
