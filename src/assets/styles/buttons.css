@@ -1,4 +1,5 @@
 .btn {
+    border: none;
     border-radius: 5px;
     padding: 8px 16px;
     background-color: var(--color-primary);
@@ -12,9 +13,9 @@
     }
 }
 
-.primary{
+.btn-success{
     background-color: #2ecc71;
-    color: rgb(7, 44, 0);
+    color: rgb(7, 44, 0) !important;
 
     &:hover{
         background-color: #34e67e;

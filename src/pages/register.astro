@@ -25,10 +25,6 @@ import { Image } from 'astro:assets';
 						<input type="text" id="username" maxlength="10" required>
 					</div>
 					<div class="input-group">
-						<label>Contraseña (Max 10)</label>
-						<input type="password" id="password" maxlength="10" required>
-					</div>
-					<div class="input-group">
 						<label>Nombre Real</label>
 						<input type="text" id="name" required>
 					</div>
@@ -39,7 +35,7 @@ import { Image } from 'astro:assets';
 					<p>
 						Al registrarse en este server, ser compromete a respetar el reglamento y acepta los terminos y condiciones
 					</p>
-					<button type="submit">CREAR CUENTA</button>
+					<button type="submit" class="btn primary">CREAR CUENTA</button>
 				</form>
 			</section>
 		</div>
@@ -64,29 +60,17 @@ import { Image } from 'astro:assets';
 		font-size: 12px;
 	}
 	input {
-		border: none;
+		border: 1px solid var(--fg);
+		border-radius: 4px;
+		background-color: var(--fg);
+		color: var(--fg);
 		width: 100%;
 		padding: 10px;
 		box-sizing: border-box;
+		background-color: transparent;
 	}
 	input:focus {
 		outline: none;
-	}
-	button {
-		width: 100%;
-		padding: 12px;
-		background: #d4af37;
-		border: none;
-		color: black;
-		font-weight: bold;
-		cursor: pointer;
-		border-radius: 4px;
-		transition: 0.3s;
-		margin-top: 10px;
-	}
-
-	button:hover {
-		background: #f1c40f;
 	}
 
 	#message {
@@ -98,16 +82,14 @@ import { Image } from 'astro:assets';
 
 <script>
 
-import { config } from "../constants/config";
-
-document.getElementById('registerForm').addEventListener('submit', async (e) => {
+document.getElementById('registerForm')!.addEventListener('submit', async (e) => {
 	e.preventDefault();
-	const msgDiv = document.getElementById('message');
+	const msgDiv = document.getElementById('message')!;
 	msgDiv.innerHTML = "Procesando...";
 
 	const data = {
 		username: document.getElementById('username').value,
-		password: document.getElementById('password').value,
+		// password: document.getElementById('password').value,
 		name: document.getElementById('name').value,
 		email: document.getElementById('email').value
 	};
@@ -122,10 +104,12 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 		const result = await response.json();
 
 		if (response.ok) {
-			msgDiv.innerHTML = `<span class="success">${result.message}</span>`;
-			document.getElementById('registerForm').reset();
+			msgDiv.innerHTML = `<span class="success">Su cuenta se registró correctamente. Le enviamos un correo con su contraseña, recuerde revisar la bandeja de correo no deseado.</span>`;
+			const $form = document.getElementById('registerForm')!;
+			$form.reset();
+			$form.innerHTML = '';
 		} else {
-			msgDiv.innerHTML = `<span class="error">${result.error}</span>`;
+			msgDiv.innerHTML = `<span class="error">${result.message}</span>`;
 		}
 	} catch (error) {
 		console.error(error)

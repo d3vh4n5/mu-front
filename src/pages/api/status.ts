@@ -6,14 +6,14 @@ export const runtime = 'nodejs';
 
 export const GET: APIRoute = async () => {
   try {
-    const res = await fetch(apiUrl + '/api/status', {
+    const res = await fetch(apiUrl + '/api/v2/players/online', {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
       },
     });
-    const response2 = await fetch(apiUrl + '/health/readiness', {
+    const response2 = await fetch(apiUrl + '/api/v2/health/readiness', {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',

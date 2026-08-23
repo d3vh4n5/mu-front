@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 
 export const GET: APIRoute = async () => {
   try {
-    const res = await fetch(apiUrl + '/api/ranking',{
+    const res = await fetch(apiUrl + '/api/v2/ranking',{
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',

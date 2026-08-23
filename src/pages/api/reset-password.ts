@@ -1,14 +1,15 @@
 import type { APIRoute } from 'astro';
 import { apiKey, apiUrl } from './config/config';
 
+export const prerender = false;
+export const runtime = 'nodejs';
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-
-    // Reenvío al API real
-    const response = await fetch(`${apiUrl}/api/v2/auth/register`, {
+    const response = await fetch(`${apiUrl}/api/v2/auth/reset-password`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
       },
@@ -21,8 +22,8 @@ export const POST: APIRoute = async ({ request }) => {
       status: response.status,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err) {
-    console.log(err)
+  } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify({ error: 'No se pudo conectar con la API' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
