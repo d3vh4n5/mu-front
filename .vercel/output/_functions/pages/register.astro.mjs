@@ -1,0 +1,26 @@
+import { c as createComponent, r as renderComponent, e as renderScript, a as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_BOq71Ym6.mjs';
+import 'piccolore';
+import { $ as $$Layout, a as $$Main } from '../chunks/Layout_CCyx8KZe.mjs';
+import { i as infoImg } from '../chunks/top-decorator_cHE80Ub1.mjs';
+import { $ as $$Image } from '../chunks/_astro_assets_BRxwfn5F.mjs';
+import { $ as $$TermsContent } from '../chunks/TermsContent_BNbUXZq-.mjs';
+/* empty css                                    */
+export { renderers } from '../renderers.mjs';
+
+const $$Register = createComponent(async ($$result, $$props, $$slots) => {
+  return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "data-astro-cid-qraosrxq": true }, { "default": async ($$result2) => renderTemplate` ${renderComponent($$result2, "Main", $$Main, { "data-astro-cid-qraosrxq": true }, { "default": async ($$result3) => renderTemplate` ${maybeRenderHead()}<div class="container" data-astro-cid-qraosrxq> ${renderComponent($$result3, "Image", $$Image, { "src": infoImg, "alt": "", "class:list": "noticias", "data-astro-cid-qraosrxq": true })} <div class="register-heading" data-astro-cid-qraosrxq> <p class="eyebrow" data-astro-cid-qraosrxq>Únete a la comunidad</p> <h1 data-astro-cid-qraosrxq>Crear cuenta</h1> <p data-astro-cid-qraosrxq>Prepara tu personaje y sé parte de la aventura desde el comienzo.</p> </div> <section class="register-layout" data-astro-cid-qraosrxq> <div class="register-benefits" data-astro-cid-qraosrxq> <h2 data-astro-cid-qraosrxq>Tu aventura empieza aquí</h2> <p data-astro-cid-qraosrxq>Regístrate para acceder al servidor, descargar el cliente y comenzar a construir tu propia historia en MU Campana.</p> <ul data-astro-cid-qraosrxq> <li data-astro-cid-qraosrxq>Accede a una experiencia clásica de MU Online.</li> <li data-astro-cid-qraosrxq>Compite en eventos y escala en el ranking.</li> <li data-astro-cid-qraosrxq>Recibe tu contraseña de forma segura por correo.</li> </ul> </div> <div class="register-form-wrapper" data-astro-cid-qraosrxq> <div id="message" role="status" aria-live="polite" data-astro-cid-qraosrxq></div> <form id="registerForm" data-astro-cid-qraosrxq> <div class="input-group" data-astro-cid-qraosrxq> <label for="username" data-astro-cid-qraosrxq>Nombre de usuario</label> <input type="text" id="username" maxlength="10" autocomplete="username" placeholder="Máximo 10 caracteres" required data-astro-cid-qraosrxq> <small data-astro-cid-qraosrxq>Será el nombre con el que ingresarás al juego.</small> </div> <div class="input-group" data-astro-cid-qraosrxq> <label for="name" data-astro-cid-qraosrxq>Nombre real</label> <input type="text" id="name" maxlength="10" autocomplete="name" placeholder="Máximo 10 caracteres" required data-astro-cid-qraosrxq> <small data-astro-cid-qraosrxq>Debe tener como máximo 10 caracteres.</small> </div> <div class="input-group" data-astro-cid-qraosrxq> <label for="email" data-astro-cid-qraosrxq>Correo electrónico</label> <input type="email" id="email" autocomplete="email" placeholder="tu-correo@ejemplo.com" required data-astro-cid-qraosrxq> <small data-astro-cid-qraosrxq>Lo necesitarás para recibir tu contraseña y recuperar la cuenta.</small> </div> <div class="terms-choice" data-astro-cid-qraosrxq> <input type="radio" id="acceptTerms" name="terms" value="accepted" required data-astro-cid-qraosrxq> <label for="acceptTerms" data-astro-cid-qraosrxq>Acepto los <button type="button" class="terms-link" id="openTerms" data-astro-cid-qraosrxq>términos y condiciones</button>.</label> </div> <p class="full-terms-link" data-astro-cid-qraosrxq><a href="/terms" data-astro-cid-qraosrxq>Leer los términos en una página completa</a></p> <p class="terms-help" data-astro-cid-qraosrxq>Verifica que tu correo sea correcto: allí recibirás la contraseña de tu cuenta.</p> <button type="submit" class="btn btn-success primary" data-astro-cid-qraosrxq>Crear mi cuenta</button> <p class="form-link" data-astro-cid-qraosrxq>¿Ya tienes una cuenta? <a href="/downloads" data-astro-cid-qraosrxq>Descarga el cliente</a></p> </form> </div> </section> <dialog id="termsDialog" aria-labelledby="termsTitle" data-astro-cid-qraosrxq> <div class="dialog-header" data-astro-cid-qraosrxq> <h2 id="termsTitle" data-astro-cid-qraosrxq>Términos y condiciones</h2> <button type="button" class="close-dialog" id="closeTerms" aria-label="Cerrar términos" data-astro-cid-qraosrxq>&times;</button> </div> ${renderComponent($$result3, "TermsContent", $$TermsContent, { "data-astro-cid-qraosrxq": true })} <button type="button" class="btn" id="closeTermsBottom" data-astro-cid-qraosrxq>Entendido</button> </dialog> </div> ` })} ` })}  ${renderScript($$result, "C:/Users/juana/OneDrive/Escritorio/front/src/pages/register.astro?astro&type=script&index=0&lang.ts")}`;
+}, "C:/Users/juana/OneDrive/Escritorio/front/src/pages/register.astro", void 0);
+
+const $$file = "C:/Users/juana/OneDrive/Escritorio/front/src/pages/register.astro";
+const $$url = "/register";
+
+const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+	__proto__: null,
+	default: $$Register,
+	file: $$file,
+	url: $$url
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const page = () => _page;
+
+export { page };

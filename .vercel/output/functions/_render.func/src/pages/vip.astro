@@ -64,20 +64,21 @@ const rows = [
 				</div>
 				<div class="table-wrapper">
 				<table>
+					<caption>Comparación de beneficios entre la modalidad FREE y los niveles VIP</caption>
 					<thead>
 					<tr>
-						<th>Categoría</th>
-						<th>Beneficio</th>
-						{tiers.map(t => <th>{t}</th>)}
+						<th scope="col">Categoría</th>
+						<th scope="col">Beneficio</th>
+						{tiers.map((tier, index) => <th class:list={{"vip-column": index > 0}} scope="col">{tier}</th>)}
 					</tr>
 					</thead>
 					<tbody>
 					{rows.map((row) => (
 						<tr>
-						<td>{row.group}</td>
-						<td>{row.label}</td>
+						<td class="category-cell">{row.group}</td>
+						<td class="benefit-cell">{row.label}</td>
 						{row.values.map((val, i) => (
-							<td>
+						<td class:list={{"vip-column": i > 0}}>
 							{val}
 							</td>
 						))}
@@ -101,6 +102,11 @@ const rows = [
 <style>
 	.noticias {
 		width: 100%;
+	}
+
+	.container {
+		width: 100%;
+		min-width: 0;
 	}
 
 	.vip-heading {
@@ -221,32 +227,94 @@ const rows = [
 
 	table {
 		width: 100%;
-		min-width: 650px;
+		min-width: 760px;
 		border-collapse: collapse;
-		font-size: 12px;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+
+	caption {
+		padding: 12px;
+		background: rgba(0, 0, 0, 0.35);
+		color: var(--fg);
+		font-size: 11px;
+		text-align: left;
 	}
 
 	th,
 	td {
-		padding: 11px 10px;
+		padding: 13px 12px;
 		border-bottom: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
 		text-align: center;
 	}
 
 	th {
+		position: sticky;
+		top: 0;
+		z-index: 2;
 		background: linear-gradient(90deg, var(--color-primary), var(--color-brown));
 		color: var(--fg);
 		font-size: 11px;
 		text-transform: uppercase;
 	}
 
+	th:first-child,
+	td:first-child {
+		width: 105px;
+		min-width: 105px;
+		position: sticky;
+		left: 0;
+		z-index: 3;
+		text-align: left;
+	}
+
+	th:nth-child(2),
+	td:nth-child(2) {
+		width: 185px;
+		min-width: 185px;
+		position: sticky;
+		left: 105px;
+		z-index: 3;
+		text-align: left;
+	}
+
 	td:first-child,
 	td:nth-child(2) {
-		text-align: left;
+		background: #16111b;
+	}
+
+	th:first-child,
+	th:nth-child(2) {
+		z-index: 4;
+	}
+
+	.category-cell {
+		color: var(--color-danger);
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.benefit-cell {
+		font-weight: 700;
+	}
+
+	.vip-column {
+		background: rgba(89, 43, 173, 0.14);
+		font-weight: 700;
+	}
+
+	tbody .vip-column {
+		color: #f0d39b;
 	}
 
 	tbody tr:nth-child(even) {
 		background: rgba(0, 0, 0, 0.2);
+	}
+
+	tbody tr:nth-child(even) td:first-child,
+	tbody tr:nth-child(even) td:nth-child(2) {
+		background: #1e1722;
 	}
 
 	tbody tr:hover {
