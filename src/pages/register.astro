@@ -51,10 +51,9 @@ import TermsContent from '../components/TermsContent.astro';
 						<input type="radio" id="acceptTerms" name="terms" value="accepted" required>
 						<label for="acceptTerms">Acepto los <button type="button" class="terms-link" id="openTerms">términos y condiciones</button>.</label>
 					</div>
-					<p class="full-terms-link"><a href="/terms">Leer los términos en una página completa</a></p>
 					<p class="terms-help">Verifica que tu correo sea correcto: allí recibirás la contraseña de tu cuenta.</p>
 					<button type="submit" class="btn btn-success primary">Crear mi cuenta</button>
-					<p class="form-link">¿Ya tienes una cuenta? <a href="/downloads">Descarga el cliente</a></p>
+					<p class="form-link"><a href="/forgot-password">¿Olvidaste tu contraseña?</a></p>
 				</form>
 				</div>
 			</section>
@@ -325,6 +324,7 @@ import TermsContent from '../components/TermsContent.astro';
 </style>
 
 <script>
+	import { throwConfetti } from '@/utils/confetti';
 
 const form = document.querySelector<HTMLFormElement>('#registerForm');
 const username = document.querySelector<HTMLInputElement>('#username');
@@ -380,6 +380,7 @@ form?.addEventListener('submit', async (e) => {
 			msgDiv.innerHTML = `<span class="success">Su cuenta se registró correctamente. Le enviamos un correo con su contraseña, recuerde revisar la bandeja de correo no deseado.</span>`;
 			form.reset();
 			form.innerHTML = '';
+			throwConfetti()
 		} else {
 			msgDiv.innerHTML = `<span class="error">${result.message}</span>`;
 		}
