@@ -1,0 +1,636 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <main class="admin-main bg-blur">
+    <div id="adminLoading" class="state" role="status">Verificando permisos...</div>
+
+    <div id="adminDenied" class="state" hidden>
+      <h1>Acceso restringido</h1>
+      <p>Esta sección es solo para administradores.</p>
+      <a class="btn" href="/">Volver al inicio</a>
+    </div>
+
+    <div id="adminApp" hidden>
+      <header class="admin-head">
+        <div>
+          <p class="eyebrow">Panel de administración</p>
+          <h1>Administración</h1>
+        </div>
+        <p class="who">Conectado como <strong id="adminName"></strong></p>
+      </header>
+
+      <nav class="tabs" role="tablist" aria-label="Secciones">
+        <button type="button" role="tab" class="tab" data-tab="search" aria-selected="true">Buscar</button>
+        <button type="button" role="tab" class="tab" data-tab="online" aria-selected="false">Online</button>
+        <button type="button" role="tab" class="tab" data-tab="audit" aria-selected="false">Auditoría</button>
+      </nav>
+
+      <p id="flash" class="flash" role="status" aria-live="polite"></p>
+
+      <section data-panel="search" class="panel">
+        <form id="searchForm" class="search-form" role="search">
+          <label for="searchInput" class="sr-only">Buscar cuenta, correo o personaje</label>
+          <input id="searchInput" name="q" type="search" minlength="2" maxlength="50"
+            placeholder="Cuenta, correo, nombre o personaje..." autocomplete="off" required>
+          <button type="submit" class="btn">Buscar</button>
+        </form>
+        <div id="searchResults" class="results"></div>
+        <div id="accountDetail"></div>
+      </section>
+
+      <section data-panel="online" class="panel" hidden>
+        <div class="panel-title">
+          <h2>Jugadores conectados</h2>
+          <button type="button" class="link-button" id="refreshOnline">Actualizar</button>
+        </div>
+        <div id="onlineList"></div>
+      </section>
+
+      <section data-panel="audit" class="panel" hidden>
+        <div class="panel-title">
+          <h2>Últimas acciones</h2>
+          <button type="button" class="link-button" id="refreshAudit">Actualizar</button>
+        </div>
+        <div id="auditList"></div>
+      </section>
+    </div>
+
+    <dialog id="actionDialog" aria-labelledby="dialogTitle">
+      <form method="dialog" id="dialogForm">
+        <h2 id="dialogTitle"></h2>
+        <p id="dialogMessage"></p>
+        <label for="dialogReason" id="dialogReasonLabel">Motivo</label>
+        <textarea id="dialogReason" rows="3" maxlength="255"></textarea>
+        <p id="dialogError" class="error"></p>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-ghost" id="dialogCancel">Cancelar</button>
+          <button type="submit" class="btn" id="dialogConfirm">Confirmar</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+</Layout>
+
+<style>
+  .admin-main {
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    border-radius: 15px;
+    transform: translateY(-10vh);
+    color: var(--fg);
+    flex: 1;
+  }
+
+  [hidden] { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  .state { padding: 40px 0; text-align: center; }
+  .state p { margin-bottom: 18px; }
+
+  .admin-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 8px 16px; }
+  .admin-head h1 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+  .eyebrow { margin: 0 0 4px; color: var(--color-danger); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .who { margin: 0; font-size: 11px; opacity: 0.8; }
+
+  .tabs { display: flex; gap: 6px; margin: 18px 0 12px; border-bottom: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); overflow-x: auto; }
+  .tab {
+    padding: 9px 14px; border: 0; border-bottom: 2px solid transparent;
+    background: none; color: var(--fg); font: inherit; font-weight: 700; cursor: pointer; opacity: 0.7;
+  }
+  .tab[aria-selected="true"] { border-bottom-color: var(--color-danger); color: var(--color-danger); opacity: 1; }
+
+  .flash { margin: 0 0 12px; padding: 10px 12px; border-radius: 4px; background: rgba(0, 0, 0, 0.35); line-height: 1.5; }
+  .flash:empty { display: none; }
+
+  .panel-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  h2 { margin: 0 0 12px; color: var(--color-danger); font-size: 16px; }
+
+  .search-form { display: flex; gap: 8px; }
+  .search-form input {
+    flex: 1; min-width: 0; padding: 10px; border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent);
+    background: rgba(0, 0, 0, 0.3); color: var(--fg); font: inherit;
+  }
+  .search-form .btn { cursor: pointer; }
+
+  .link-button { border: 0; padding: 0; background: none; color: var(--fg); font: inherit; font-size: 11px; text-decoration: underline; cursor: pointer; }
+
+  dialog {
+    width: min(440px, calc(100% - 32px)); box-sizing: border-box; padding: 20px;
+    border: 1px solid var(--color-danger); border-radius: 6px; background: #0e0a16; color: var(--fg);
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, 0.7); }
+  dialog h2 { margin-top: 0; }
+  dialog p { line-height: 1.5; }
+  dialog label { display: block; margin: 10px 0 4px; font-size: 11px; font-weight: 700; }
+  dialog textarea {
+    width: 100%; box-sizing: border-box; padding: 8px; border-radius: 4px; resize: vertical;
+    border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent); background: rgba(0, 0, 0, 0.3); color: var(--fg); font: inherit;
+  }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+  .dialog-actions .btn { cursor: pointer; }
+
+  @media (max-width: 760px) {
+    .admin-main { padding: 16px; border-radius: 10px; transform: translateY(-6vh); }
+  }
+  @media (max-width: 480px) {
+    .admin-main { padding: 12px; border-radius: 0; }
+    .search-form { flex-direction: column; }
+  }
+</style>
+
+<!-- Estilos del contenido generado por JS -->
+<style is:global>
+  .adm-btn-ghost, .btn.btn-ghost {
+    background: transparent !important;
+    border: 1px solid color-mix(in srgb, var(--fg) 45%, transparent) !important;
+    color: var(--fg) !important;
+  }
+  .btn.btn-danger { background: #a3262a; color: #fff !important; }
+  .btn.btn-danger:hover { background: #c4373b; }
+  .adm-small { padding: 4px 9px !important; font-size: 11px; cursor: pointer; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 14px 0; }
+  .results:empty { display: none; }
+  .result-group h3 {
+    margin: 0 0 8px; padding: 0; background: none; text-align: left;
+    color: var(--fg); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8;
+  }
+  .result-list { display: grid; gap: 6px; }
+  .result-item {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px;
+    width: 100%; padding: 9px 10px; border-radius: 4px; text-align: left; cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--fg) 22%, transparent); background: rgba(0, 0, 0, 0.3);
+    color: var(--fg); font: inherit;
+  }
+  .result-item:hover, .result-item:focus-visible { border-color: var(--color-danger); outline: none; }
+  .result-item small { opacity: 0.7; }
+  .result-empty { margin: 0; font-size: 12px; opacity: 0.7; }
+
+  .badge-status {
+    display: inline-block; padding: 1px 7px; border-radius: 3px; font-size: 10px; font-weight: 700;
+    border: 1px solid currentColor; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .st-active, .st-normal { color: var(--color-succes); }
+  .st-banned { color: var(--color-error); }
+  .st-admin, .st-gm { color: var(--color-danger); }
+  .st-online { color: var(--color-succes); }
+  .st-offline { color: color-mix(in srgb, var(--fg) 70%, transparent); }
+
+  .detail {
+    margin-top: 16px; padding: 16px; border-radius: 6px;
+    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent); background: rgba(0, 0, 0, 0.3);
+  }
+  .detail-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+  .detail-head h3 {
+    display: flex; align-items: center; gap: 8px; margin: 0; padding: 0; background: none;
+    color: var(--fg); font-size: 20px; text-align: left;
+  }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; margin: 14px 0; }
+  .detail-grid dt { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.65; }
+  .detail-grid dd { margin: 3px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+  .detail h4 { margin: 18px 0 8px; color: var(--color-danger); font-size: 13px; }
+
+  .vip-form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+  .vip-form label { display: grid; gap: 4px; font-size: 10px; font-weight: 700; }
+  .vip-form select, .vip-form input {
+    padding: 7px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent);
+    background: #120c1c; color: var(--fg); font: inherit;
+  }
+  .vip-form input { width: 90px; }
+
+  .table-scroll { overflow-x: auto; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent); }
+  .adm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .adm-table th, .adm-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid color-mix(in srgb, var(--fg) 12%, transparent); white-space: nowrap; }
+  .adm-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(0, 0, 0, 0.35); color: var(--color-danger); }
+  .adm-table td.wrap { white-space: normal; min-width: 180px; }
+  .adm-table tr.clickable { cursor: pointer; }
+  .adm-table tr.clickable:hover { background: rgba(255, 165, 0, 0.08); }
+  .row-actions { display: flex; gap: 6px; }
+  .muted { opacity: 0.65; }
+</style>
+
+<script>
+  import { getSession, isAdmin } from '../lib/client/session';
+
+  type AccountStatus = 'active' | 'banned' | 'admin';
+  type CharacterStatus = 'normal' | 'banned' | 'gm';
+  type AuditEntry = {
+    Id: number; CreatedAt: string; AdminUser: string; Action: string;
+    TargetType: string; Target: string; Reason: string | null; Ip: string | null;
+  };
+  type SearchResult = {
+    accounts: { username: string; name: string; email: string; status: AccountStatus; accountLevel: number }[];
+    characters: { name: string; account: string; className: string; level: number; resets: number; status: CharacterStatus }[];
+  };
+  type AccountDetail = {
+    account: {
+      username: string; name: string; email: string; status: AccountStatus;
+      storedAccountLevel: number; accountLevel: number; vipExpiresAt: string | null; createdAt: string | null;
+    };
+    connection: {
+      online: boolean; server: string | null; ip: string | null; lastConnect: string | null;
+      lastDisconnect: string | null; currentCharacter: string | null; onlineHours: number;
+    };
+    characters: {
+      name: string; className: string; level: number; resets: number; status: CharacterStatus;
+      money: number; map: { name: string; x: number; y: number };
+    }[];
+    audit: AuditEntry[];
+  };
+  type OnlineEntry = { username: string; character: string | null; server: string | null; ip: string | null; since: string | null };
+
+  const STATUS_LABEL: Record<string, string> = {
+    active: 'Activa', banned: 'Baneado', admin: 'Admin', normal: 'Normal', gm: 'GM',
+  };
+  const ACTION_LABEL: Record<string, string> = {
+    'account.ban': 'Ban de cuenta',
+    'account.unban': 'Desban de cuenta',
+    'account.vip': 'Cambio de VIP',
+    'character.ban': 'Ban de personaje',
+    'character.unban': 'Desban de personaje',
+    'character.gm.grant': 'GM otorgado',
+    'character.gm.revoke': 'GM quitado',
+  };
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+  const esc = (value: unknown) =>
+    String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+  const fmtDate = (value: string | null) => (value ? new Date(value).toLocaleString('es-AR') : '-');
+  const fmtNum = (n: number) => n.toLocaleString('es-AR');
+  const badge = (status: string) => `<span class="badge-status st-${esc(status)}">${esc(STATUS_LABEL[status] ?? status)}</span>`;
+
+  const flash = $('flash');
+  function setFlash(text: string, type: 'success' | 'error' | '' = '') {
+    if (!flash) return;
+    flash.textContent = text;
+    flash.className = `flash ${type}`.trim();
+  }
+
+  async function api<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+    const response = await fetch(`/api/admin/${path}`, {
+      method: init?.method ?? 'GET',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: init?.body ? JSON.stringify(init.body) : undefined,
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.status === 401 || response.status === 403) {
+      if (response.status === 401) showDenied();
+      throw new Error(result.message || 'No tenés permisos para esta acción');
+    }
+    if (!response.ok) {
+      const message = Array.isArray(result.message) ? result.message.join('. ') : result.message;
+      throw new Error(message || 'No se pudo completar la acción');
+    }
+    return result as T;
+  }
+
+  function showDenied() {
+    $('adminLoading')?.setAttribute('hidden', '');
+    $('adminApp')?.setAttribute('hidden', '');
+    $('adminDenied')?.removeAttribute('hidden');
+  }
+
+  // ------------------------------------------------------------------ tabs
+  const loaders: Record<string, () => void> = {
+    online: () => loadOnline(),
+    audit: () => loadAudit(),
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('.tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const name = tab.dataset.tab!;
+      document.querySelectorAll<HTMLButtonElement>('.tab').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+      document.querySelectorAll<HTMLElement>('[data-panel]').forEach((p) => p.toggleAttribute('hidden', p.dataset.panel !== name));
+      setFlash('');
+      loaders[name]?.();
+    });
+  });
+
+  function showTab(name: string) {
+    document.querySelector<HTMLButtonElement>(`.tab[data-tab="${name}"]`)?.click();
+  }
+
+  // ---------------------------------------------------------------- search
+  const searchResults = $('searchResults');
+  const accountDetail = $('accountDetail');
+  let currentAccount: string | null = null;
+
+  $('searchForm')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const q = ($('searchInput') as HTMLInputElement | null)?.value.trim() ?? '';
+    if (q.length < 2 || !searchResults) return;
+    searchResults.innerHTML = '<p class="result-empty">Buscando...</p>';
+    try {
+      const data = await api<SearchResult>(`search?q=${encodeURIComponent(q)}`);
+      searchResults.innerHTML = `
+        <div class="result-group">
+          <h3>Cuentas (${data.accounts.length})</h3>
+          <div class="result-list">
+            ${data.accounts.length ? data.accounts.map((a) => `
+              <button type="button" class="result-item" data-open-account="${esc(a.username)}">
+                <span><strong>${esc(a.username)}</strong> <small>${esc(a.email)}</small></span>
+                <span>${a.accountLevel > 0 ? `<small>VIP ${a.accountLevel}</small> ` : ''}${badge(a.status)}</span>
+              </button>`).join('') : '<p class="result-empty">Sin resultados</p>'}
+          </div>
+        </div>
+        <div class="result-group">
+          <h3>Personajes (${data.characters.length})</h3>
+          <div class="result-list">
+            ${data.characters.length ? data.characters.map((c) => `
+              <button type="button" class="result-item" data-open-account="${esc(c.account)}">
+                <span><strong>${esc(c.name)}</strong> <small>${esc(c.className)} · Nv ${c.level} · ${c.resets} RR · cuenta ${esc(c.account)}</small></span>
+                ${badge(c.status)}
+              </button>`).join('') : '<p class="result-empty">Sin resultados</p>'}
+          </div>
+        </div>`;
+    } catch (error) {
+      searchResults.innerHTML = '';
+      setFlash(error instanceof Error ? error.message : 'Error en la búsqueda', 'error');
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = (event.target as HTMLElement).closest<HTMLElement>('[data-open-account]');
+    if (!target) return;
+    const username = target.dataset.openAccount!;
+    if (target.closest('[data-panel="search"]') === null) showTab('search');
+    openAccount(username);
+  });
+
+  async function openAccount(username: string) {
+    currentAccount = username;
+    if (!accountDetail) return;
+    accountDetail.innerHTML = '<div class="detail">Cargando cuenta...</div>';
+    try {
+      const data = await api<AccountDetail>(`accounts/${encodeURIComponent(username)}`);
+      renderAccount(data);
+      accountDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+      accountDetail.innerHTML = '';
+      setFlash(error instanceof Error ? error.message : 'No se pudo cargar la cuenta', 'error');
+    }
+  }
+
+  function renderAudit(entries: AuditEntry[], showTarget = true) {
+    if (!entries.length) return '<p class="result-empty">Sin acciones registradas.</p>';
+    return `
+      <div class="table-scroll">
+        <table class="adm-table">
+          <thead><tr><th>Fecha</th><th>Admin</th><th>Acción</th>${showTarget ? '<th>Objetivo</th>' : ''}<th>Motivo</th></tr></thead>
+          <tbody>
+            ${entries.map((e) => `
+              <tr ${showTarget && e.TargetType === 'account' ? `class="clickable" data-open-account="${esc(e.Target)}"` : ''}>
+                <td>${esc(fmtDate(e.CreatedAt))}</td>
+                <td>${esc(e.AdminUser)}</td>
+                <td>${esc(ACTION_LABEL[e.Action] ?? e.Action)}</td>
+                ${showTarget ? `<td>${esc(e.Target)} <span class="muted">(${e.TargetType === 'account' ? 'cuenta' : 'pj'})</span></td>` : ''}
+                <td class="wrap">${esc(e.Reason ?? '-')}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderAccount(data: AccountDetail) {
+    if (!accountDetail) return;
+    const { account, connection, characters, audit } = data;
+    const vipText = account.accountLevel > 0
+      ? `VIP ${account.accountLevel} hasta ${fmtDate(account.vipExpiresAt)}`
+      : account.storedAccountLevel > 0 ? `FREE (VIP ${account.storedAccountLevel} vencido)` : 'FREE';
+
+    const accountAction = account.status === 'banned'
+      ? `<button type="button" class="btn adm-small" data-act="account-unban">Desbanear cuenta</button>`
+      : account.status === 'admin'
+        ? ''
+        : `<button type="button" class="btn btn-danger adm-small" data-act="account-ban">Banear cuenta</button>`;
+
+    accountDetail.innerHTML = `
+      <article class="detail" data-account="${esc(account.username)}">
+        <div class="detail-head">
+          <h3>${esc(account.username)} ${badge(account.status)}</h3>
+          <div class="row-actions">${accountAction}</div>
+        </div>
+        <dl class="detail-grid">
+          <div><dt>Nombre</dt><dd>${esc(account.name)}</dd></div>
+          <div><dt>Correo</dt><dd>${esc(account.email || '-')}</dd></div>
+          <div><dt>Creada</dt><dd>${esc(fmtDate(account.createdAt))}</dd></div>
+          <div><dt>Nivel de cuenta</dt><dd>${esc(vipText)}</dd></div>
+          <div><dt>Conexión</dt><dd>${connection.online
+            ? `<span class="st-online">● Online</span> ${esc(connection.server ?? '')}${connection.currentCharacter ? ` · ${esc(connection.currentCharacter)}` : ''}`
+            : `<span class="st-offline">● Offline</span>`}</dd></div>
+          <div><dt>Última IP</dt><dd>${esc(connection.ip ?? '-')}</dd></div>
+          <div><dt>Último ingreso</dt><dd>${esc(fmtDate(connection.lastConnect))}</dd></div>
+          <div><dt>Horas online</dt><dd>${fmtNum(connection.onlineHours)}</dd></div>
+        </dl>
+
+        <h4>VIP</h4>
+        <form class="vip-form" data-vip-form>
+          <label>Nivel
+            <select name="level">
+              ${[0, 1, 2, 3].map((l) => `<option value="${l}" ${l === account.accountLevel ? 'selected' : ''}>${l === 0 ? 'FREE (quitar VIP)' : `VIP ${l}`}</option>`).join('')}
+            </select>
+          </label>
+          <label>Días
+            <input type="number" name="days" min="1" max="3650" value="30">
+          </label>
+          <button type="submit" class="btn adm-small">Guardar VIP</button>
+        </form>
+
+        <h4>Personajes (${characters.length})</h4>
+        ${characters.length ? `
+          <div class="table-scroll">
+            <table class="adm-table">
+              <thead><tr><th>Nombre</th><th>Clase</th><th>Nivel</th><th>Resets</th><th>Zen</th><th>Mapa</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody>
+                ${characters.map((c) => `
+                  <tr data-character="${esc(c.name)}">
+                    <td><strong>${esc(c.name)}</strong></td>
+                    <td>${esc(c.className)}</td>
+                    <td>${c.level}</td>
+                    <td>${c.resets}</td>
+                    <td>${fmtNum(c.money)}</td>
+                    <td>${esc(c.map.name)} (${c.map.x}, ${c.map.y})</td>
+                    <td>${badge(c.status)}</td>
+                    <td><div class="row-actions">
+                      ${c.status === 'banned'
+                        ? '<button type="button" class="btn adm-small" data-act="character-unban">Desbanear</button>'
+                        : '<button type="button" class="btn btn-danger adm-small" data-act="character-ban">Banear</button>'}
+                      ${c.status === 'gm'
+                        ? '<button type="button" class="btn btn-ghost adm-small" data-act="character-ungm">Quitar GM</button>'
+                        : c.status === 'normal' ? '<button type="button" class="btn btn-ghost adm-small" data-act="character-gm">Dar GM</button>' : ''}
+                    </div></td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>` : '<p class="result-empty">La cuenta no tiene personajes.</p>'}
+
+        <h4>Historial de acciones</h4>
+        ${renderAudit(audit)}
+      </article>`;
+  }
+
+  // --------------------------------------------------------------- dialog
+  const dialog = $('actionDialog') as HTMLDialogElement | null;
+  let pendingAction: ((reason: string) => Promise<void>) | null = null;
+  let reasonRequired = false;
+
+  function askConfirm(opts: { title: string; message: string; reasonRequired: boolean; confirmLabel: string; danger?: boolean }, run: (reason: string) => Promise<void>) {
+    if (!dialog) return;
+    $('dialogTitle')!.textContent = opts.title;
+    $('dialogMessage')!.textContent = opts.message;
+    $('dialogReasonLabel')!.textContent = opts.reasonRequired ? 'Motivo (obligatorio)' : 'Motivo (opcional)';
+    const reason = $('dialogReason') as HTMLTextAreaElement;
+    reason.value = '';
+    $('dialogError')!.textContent = '';
+    const confirm = $('dialogConfirm') as HTMLButtonElement;
+    confirm.textContent = opts.confirmLabel;
+    confirm.classList.toggle('btn-danger', !!opts.danger);
+    confirm.disabled = false;
+    reasonRequired = opts.reasonRequired;
+    pendingAction = run;
+    dialog.showModal();
+    reason.focus();
+  }
+
+  $('dialogCancel')?.addEventListener('click', () => dialog?.close());
+
+  $('dialogForm')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const reason = ($('dialogReason') as HTMLTextAreaElement).value.trim();
+    if (reasonRequired && reason.length < 3) {
+      $('dialogError')!.textContent = 'Escribí un motivo de al menos 3 caracteres.';
+      return;
+    }
+    const confirm = $('dialogConfirm') as HTMLButtonElement;
+    confirm.disabled = true;
+    try {
+      await pendingAction?.(reason);
+      dialog?.close();
+    } catch (error) {
+      $('dialogError')!.textContent = error instanceof Error ? error.message : 'Error';
+      confirm.disabled = false;
+    }
+  });
+
+  async function runAndRefresh(path: string, body: Record<string, unknown>) {
+    const result = await api<{ message: string }>(path, { method: 'POST', body });
+    setFlash(result.message, 'success');
+    if (currentAccount) await openAccount(currentAccount);
+  }
+
+  accountDetail?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-act]');
+    if (!button) return;
+    const username = button.closest<HTMLElement>('[data-account]')?.dataset.account;
+    const character = button.closest<HTMLElement>('[data-character]')?.dataset.character;
+    const enc = encodeURIComponent;
+
+    switch (button.dataset.act) {
+      case 'account-ban':
+        askConfirm({ title: `Banear cuenta ${username}`, message: 'La cuenta no podrá ingresar al juego ni a la web.', reasonRequired: true, confirmLabel: 'Banear', danger: true },
+          (reason) => runAndRefresh(`accounts/${enc(username!)}/ban`, { reason }));
+        break;
+      case 'account-unban':
+        askConfirm({ title: `Desbanear cuenta ${username}`, message: 'La cuenta volverá a poder ingresar.', reasonRequired: false, confirmLabel: 'Desbanear' },
+          (reason) => runAndRefresh(`accounts/${enc(username!)}/unban`, reason ? { reason } : {}));
+        break;
+      case 'character-ban':
+        askConfirm({ title: `Banear a ${character}`, message: 'El personaje quedará bloqueado.', reasonRequired: true, confirmLabel: 'Banear', danger: true },
+          (reason) => runAndRefresh(`characters/${enc(character!)}/ban`, { reason }));
+        break;
+      case 'character-unban':
+        askConfirm({ title: `Desbanear a ${character}`, message: 'El personaje volverá a estar disponible.', reasonRequired: false, confirmLabel: 'Desbanear' },
+          (reason) => runAndRefresh(`characters/${enc(character!)}/unban`, reason ? { reason } : {}));
+        break;
+      case 'character-gm':
+        askConfirm({ title: `Dar GM a ${character}`, message: 'El personaje tendrá comandos de GameMaster dentro del juego.', reasonRequired: false, confirmLabel: 'Dar GM' },
+          (reason) => runAndRefresh(`characters/${enc(character!)}/gm`, reason ? { reason } : {}));
+        break;
+      case 'character-ungm':
+        askConfirm({ title: `Quitar GM a ${character}`, message: 'El personaje volverá a ser normal.', reasonRequired: false, confirmLabel: 'Quitar GM' },
+          (reason) => runAndRefresh(`characters/${enc(character!)}/ungm`, reason ? { reason } : {}));
+        break;
+    }
+  });
+
+  accountDetail?.addEventListener('submit', (event) => {
+    const form = (event.target as HTMLElement).closest<HTMLFormElement>('[data-vip-form]');
+    if (!form) return;
+    event.preventDefault();
+    const username = form.closest<HTMLElement>('[data-account]')?.dataset.account;
+    const data = new FormData(form);
+    const level = Number(data.get('level'));
+    const days = Number(data.get('days'));
+    const message = level > 0
+      ? `Asignar VIP ${level} por ${days} días a ${username}. Reemplaza el VIP actual.`
+      : `Quitar el VIP de ${username}.`;
+    askConfirm({ title: 'Cambiar VIP', message, reasonRequired: false, confirmLabel: 'Guardar' },
+      (reason) => runAndRefresh(`accounts/${encodeURIComponent(username!)}/vip`, {
+        level, ...(level > 0 ? { days } : {}), ...(reason ? { reason } : {}),
+      }));
+  });
+
+  // ---------------------------------------------------------- online/audit
+  async function loadOnline() {
+    const list = $('onlineList');
+    if (!list) return;
+    list.innerHTML = '<p class="result-empty">Cargando...</p>';
+    try {
+      const data = await api<OnlineEntry[]>('online');
+      list.innerHTML = data.length ? `
+        <p class="muted">${data.length} cuenta(s) conectada(s). Clic en una fila para ver la cuenta.</p>
+        <div class="table-scroll">
+          <table class="adm-table">
+            <thead><tr><th>Cuenta</th><th>Personaje</th><th>Servidor</th><th>IP</th><th>Desde</th></tr></thead>
+            <tbody>
+              ${data.map((o) => `
+                <tr class="clickable" data-open-account="${esc(o.username)}">
+                  <td><strong>${esc(o.username)}</strong></td>
+                  <td>${esc(o.character ?? '-')}</td>
+                  <td>${esc(o.server ?? '-')}</td>
+                  <td>${esc(o.ip ?? '-')}</td>
+                  <td>${esc(fmtDate(o.since))}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '<p class="result-empty">No hay jugadores conectados.</p>';
+    } catch (error) {
+      list.innerHTML = '';
+      setFlash(error instanceof Error ? error.message : 'Error', 'error');
+    }
+  }
+
+  async function loadAudit() {
+    const list = $('auditList');
+    if (!list) return;
+    list.innerHTML = '<p class="result-empty">Cargando...</p>';
+    try {
+      list.innerHTML = renderAudit(await api<AuditEntry[]>('audit?limit=100'));
+    } catch (error) {
+      list.innerHTML = '';
+      setFlash(error instanceof Error ? error.message : 'Error', 'error');
+    }
+  }
+
+  $('refreshOnline')?.addEventListener('click', loadOnline);
+  $('refreshAudit')?.addEventListener('click', loadAudit);
+
+  // ------------------------------------------------------------------ init
+  getSession().then((session) => {
+    if (!isAdmin(session)) return showDenied();
+    $('adminLoading')?.setAttribute('hidden', '');
+    $('adminApp')?.removeAttribute('hidden');
+    const name = $('adminName');
+    if (name && session.authenticated) name.textContent = session.user.username;
+  });
+</script>

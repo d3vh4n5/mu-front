@@ -7,6 +7,7 @@ const pages = [
     { path: "/", name: "Inicio" },
     { path: "/register", name: "Crear cuenta" },
     { path: "/account", name: "Mi cuenta", id: "accountLink", hidden: true },
+    { path: "/admin", name: "Admin", id: "adminLink", hidden: true },
     { path: "/downloads", name: "Bajar Mu" },
     { path: "/help", name: "Mu manual" },
     { path: "/vip", name: "VIP" },
@@ -190,21 +191,14 @@ const pages = [
 </style>
 
 <script>
-    const accountLink = document.getElementById('accountLink');
-    const logoutLink = document.getElementById('logoutLink');
-    const auth = localStorage.getItem('mu-auth');
+    import { getSession, isAdmin, logout } from '../lib/client/session';
 
-    try {
-        const session = auth ? JSON.parse(auth) : null;
-        if (session?.accessToken && session.expiresAt > Date.now()) {
-            accountLink?.removeAttribute('hidden');
-            logoutLink?.removeAttribute('hidden');
-        } else if (auth) {
-            localStorage.removeItem('mu-auth');
-        }
-    } catch {
-        localStorage.removeItem('mu-auth');
-    }
+    getSession().then((session) => {
+        if (!session.authenticated) return;
+        document.getElementById('accountLink')?.removeAttribute('hidden');
+        document.getElementById('logoutLink')?.removeAttribute('hidden');
+        if (isAdmin(session)) document.getElementById('adminLink')?.removeAttribute('hidden');
+    });
 
     const nav = document.querySelector('header nav');
     const menuToggle = nav?.querySelector<HTMLButtonElement>('.menu-toggle');
@@ -227,8 +221,5 @@ const pages = [
         if (nav && !nav.contains(event.target as Node)) setMenuOpen(false);
     });
 
-    document.querySelector('#logoutLink button')?.addEventListener('click', () => {
-        localStorage.removeItem('mu-auth');
-        window.location.href = '/';
-    });
+    document.querySelector('#logoutLink button')?.addEventListener('click', () => logout('/'));
 </script>

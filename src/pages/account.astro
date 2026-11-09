@@ -261,6 +261,8 @@ const commands = [
 </style>
 
 <script>
+  import { getSession } from '../lib/client/session';
+
   type Stats = { strength: number; dexterity: number; vitality: number; energy: number; leadership: number };
   type Character = {
     name: string;
@@ -306,31 +308,21 @@ const commands = [
   const esc = (value: unknown) =>
     String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-  function getToken(): string | null {
-    try {
-      const session = JSON.parse(localStorage.getItem('mu-auth') || 'null');
-      if (session?.accessToken && session.expiresAt > Date.now()) return session.accessToken;
-    } catch { /* sesión corrupta */ }
-    localStorage.removeItem('mu-auth');
-    return null;
-  }
+  let sessionExpired = false;
 
   function showLoginRequired() {
-    localStorage.removeItem('mu-auth');
+    sessionExpired = true;
     loading?.setAttribute('hidden', '');
     content?.setAttribute('hidden', '');
     loginRequired?.removeAttribute('hidden');
   }
 
   async function api<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
-    const token = getToken();
-    if (!token) {
-      showLoginRequired();
-      throw new Error('Sesión expirada');
-    }
+    // La cookie httpOnly de sesión viaja sola (same-origin)
     const response = await fetch(`/api/account${path}`, {
       method: init?.method ?? 'GET',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
       body: init?.body ? JSON.stringify(init.body) : undefined,
     });
     const result = await response.json().catch(() => ({}));
@@ -461,7 +453,7 @@ const commands = [
       content?.removeAttribute('hidden');
       render();
     } catch (error) {
-      if (!getToken()) return;
+      if (sessionExpired) return;
       loading?.setAttribute('hidden', '');
       content?.removeAttribute('hidden');
       setMessage(globalMessage, error instanceof Error ? error.message : 'No se pudo cargar la cuenta', 'error');
@@ -568,6 +560,8 @@ const commands = [
     window.location.href = `mailto:soporte@mu-campana.com?subject=${subject}&body=${body}`;
   });
 
-  if (getToken()) loadAccount();
-  else showLoginRequired();
+  getSession().then((session) => {
+    if (session.authenticated) loadAccount();
+    else showLoginRequired();
+  });
 </script>

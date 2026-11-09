@@ -103,33 +103,20 @@
 </style>
 
 <script>
+  import { getSession, logout } from '../lib/client/session';
+
   const widgetForm = document.getElementById('loginWidgetForm') as HTMLFormElement | null;
   const widgetMessage = document.getElementById('widgetMessage');
   const loggedOut = document.getElementById('loggedOut');
   const loggedIn = document.getElementById('loggedIn');
   const widgetWelcome = document.getElementById('widgetWelcome');
 
-  const getSession = () => {
-    try {
-      const stored = localStorage.getItem('mu-auth');
-      const session = stored ? JSON.parse(stored) : null;
-      if (!session?.accessToken || session.expiresAt <= Date.now()) {
-        localStorage.removeItem('mu-auth');
-        return null;
-      }
-      return session;
-    } catch {
-      localStorage.removeItem('mu-auth');
-      return null;
-    }
-  };
-
-  const renderSession = () => {
-    const session = getSession();
-    if (session) {
+  const renderSession = async () => {
+    const session = await getSession();
+    if (session.authenticated) {
       loggedOut?.setAttribute('hidden', '');
       loggedIn?.removeAttribute('hidden');
-      if (widgetWelcome) widgetWelcome.textContent = `Hola, ${session.user?.name || session.user?.username}`;
+      if (widgetWelcome) widgetWelcome.textContent = `Hola, ${session.user.name || session.user.username}`;
     } else {
       loggedIn?.setAttribute('hidden', '');
       loggedOut?.removeAttribute('hidden');
@@ -150,14 +137,10 @@
         body: JSON.stringify({ login: formData.get('username'), password: formData.get('password') }),
       });
       const result = await response.json();
-      if (!response.ok || !result.access_token) {
+      if (!response.ok || !result.user) {
         throw new Error(result.message || result.error || 'Usuario o contraseña incorrectos');
       }
-      localStorage.setItem('mu-auth', JSON.stringify({
-        accessToken: result.access_token,
-        user: result.user,
-        expiresAt: Date.now() + Number(result.expires_in || 3600) * 1000,
-      }));
+      // La sesión queda en una cookie httpOnly puesta por /api/login
       window.location.href = '/account';
     } catch (error) {
       widgetMessage.textContent = error instanceof Error ? error.message : 'No se pudo conectar con la API';
@@ -165,10 +148,7 @@
     }
   });
 
-  document.getElementById('widgetLogout')?.addEventListener('click', () => {
-    localStorage.removeItem('mu-auth');
-    window.location.href = '/';
-  });
+  document.getElementById('widgetLogout')?.addEventListener('click', () => logout('/'));
 
   renderSession();
 </script>
