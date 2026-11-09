@@ -1,0 +1,174 @@
+<section class="login-widget" aria-labelledby="login-title">
+  <div id="loggedOut">
+    <h2 id="login-title">Ingresar</h2>
+    <form id="loginWidgetForm">
+      <label for="widgetUsername">Usuario</label>
+      <input id="widgetUsername" name="username" type="text" autocomplete="username" required>
+      <label for="widgetPassword">Contraseña</label>
+      <input id="widgetPassword" name="password" type="password" autocomplete="current-password" required>
+      <button type="submit" class="btn primary">Ingresar</button>
+      <a href="/forgot-password">¿Olvidaste tu contraseña?</a>
+      <p id="widgetMessage" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+  <div id="loggedIn" hidden>
+    <h2>Sesión activa</h2>
+    <p id="widgetWelcome"></p>
+    <div class="logged-actions">
+      <a href="/account" class="btn primary">Gestionar personaje</a>
+      <button id="widgetLogout" type="button">Cerrar sesión</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .login-widget {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    border-radius: 5px;
+    background: var(--bg-transparent);
+  }
+
+  h2 {
+    margin: 0 0 12px;
+    color: var(--color-danger);
+    font-size: 15px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  label {
+    display: block;
+    margin: 8px 0 4px;
+    font-size: 11px;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 7px;
+    border: 1px solid var(--fg);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--fg);
+    font: inherit;
+  }
+
+  input:focus { outline: 1px solid var(--color-primary); }
+
+  .primary {
+    width: 100%;
+    margin-top: 12px;
+    padding: 7px 10px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  form > a {
+    display: block;
+    margin-top: 9px;
+    color: var(--fg);
+    font-size: 11px;
+    text-align: center;
+  }
+
+  #widgetMessage {
+    min-height: 14px;
+    margin: 9px 0 0;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  #widgetWelcome {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .logged-actions { display: grid; gap: 8px; }
+
+  .logged-actions button {
+    border: 0;
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    text-decoration: underline;
+  }
+
+  [hidden] { display: none !important; }
+</style>
+
+<script>
+  const widgetForm = document.getElementById('loginWidgetForm') as HTMLFormElement | null;
+  const widgetMessage = document.getElementById('widgetMessage');
+  const loggedOut = document.getElementById('loggedOut');
+  const loggedIn = document.getElementById('loggedIn');
+  const widgetWelcome = document.getElementById('widgetWelcome');
+
+  const getSession = () => {
+    try {
+      const stored = localStorage.getItem('mu-auth');
+      const session = stored ? JSON.parse(stored) : null;
+      if (!session?.accessToken || session.expiresAt <= Date.now()) {
+        localStorage.removeItem('mu-auth');
+        return null;
+      }
+      return session;
+    } catch {
+      localStorage.removeItem('mu-auth');
+      return null;
+    }
+  };
+
+  const renderSession = () => {
+    const session = getSession();
+    if (session) {
+      loggedOut?.setAttribute('hidden', '');
+      loggedIn?.removeAttribute('hidden');
+      if (widgetWelcome) widgetWelcome.textContent = `Hola, ${session.user?.name || session.user?.username}`;
+    } else {
+      loggedIn?.setAttribute('hidden', '');
+      loggedOut?.removeAttribute('hidden');
+    }
+  };
+
+  widgetForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!widgetMessage) return;
+    const formData = new FormData(widgetForm);
+    widgetMessage.textContent = 'Ingresando...';
+    widgetMessage.className = '';
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login: formData.get('username'), password: formData.get('password') }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.access_token) {
+        throw new Error(result.message || result.error || 'Usuario o contraseña incorrectos');
+      }
+      localStorage.setItem('mu-auth', JSON.stringify({
+        accessToken: result.access_token,
+        user: result.user,
+        expiresAt: Date.now() + Number(result.expires_in || 3600) * 1000,
+      }));
+      window.location.href = '/account';
+    } catch (error) {
+      widgetMessage.textContent = error instanceof Error ? error.message : 'No se pudo conectar con la API';
+      widgetMessage.className = 'error';
+    }
+  });
+
+  document.getElementById('widgetLogout')?.addEventListener('click', () => {
+    localStorage.removeItem('mu-auth');
+    window.location.href = '/';
+  });
+
+  renderSession();
+</script>

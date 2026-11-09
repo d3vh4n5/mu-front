@@ -13,6 +13,7 @@ const { title, columns, data, id } = Astro.props
 <div class="mu-box">
   {title && <h3>{title}</h3>}
 
+  <div class="mu-table-scroll">
   <table class="mu-table">
     <thead>
       <tr>
@@ -34,10 +35,12 @@ const { title, columns, data, id } = Astro.props
       ))}
     </tbody>
   </table>
+  </div>
 </div>
 
 <style is:global>
  .mu-box {
+    width: 100%;
     max-width: 800px;
     margin: 20px auto;
     border: 2px solid var(--color-danger);
@@ -56,9 +59,31 @@ const { title, columns, data, id } = Astro.props
     text-shadow: 1px 1px 2px #000;
   }
 
+  .mu-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .mu-table {
     width: 100%;
     border-collapse: collapse;
+  }
+
+  @media (max-width: 480px) {
+    .mu-box {
+      margin: 14px 0;
+    }
+
+    .mu-table th,
+    .mu-table td {
+      padding: 6px;
+      font-size: 11px;
+    }
+
+    .mu-table td:first-child {
+      word-break: break-word;
+    }
   }
 
   .mu-table th {

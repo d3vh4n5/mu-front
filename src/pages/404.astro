@@ -1,0 +1,160 @@
+---
+const title = 'Mapa perdido | MU Campana';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="not-found" aria-labelledby="not-found-title">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="portal" aria-hidden="true"><span>?</span></div>
+      <p class="eyebrow">MU Campana · Mapa desconocido</p>
+      <p class="code" aria-hidden="true">404</p>
+      <h1 id="not-found-title">¡Te teletransportaste demasiado lejos!</h1>
+      <p class="message">
+        Esta página no existe. El portal intentó encontrarla, pero terminó en un mapa sin monstruos, sin cofres y sin señal.
+      </p>
+      <a href="/" class="home-button">Volver al inicio <span aria-hidden="true">→</span></a>
+    </main>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+
+  :global(html), :global(body) {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  :global(body) {
+    background: #080719;
+    color: #f2dfb0;
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+
+  .not-found {
+    position: relative;
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    align-content: center;
+    overflow: hidden;
+    padding: 32px 20px;
+    text-align: center;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(111, 61, 170, 0.34), transparent 20%),
+      radial-gradient(circle at 18% 80%, rgba(31, 102, 166, 0.24), transparent 25%),
+      radial-gradient(circle at 85% 15%, rgba(185, 87, 38, 0.2), transparent 22%),
+      #080719;
+  }
+
+  .not-found::before,
+  .not-found::after {
+    position: absolute;
+    content: '';
+    inset: 7%;
+    border: 1px solid rgba(242, 223, 176, 0.16);
+    transform: rotate(12deg);
+    pointer-events: none;
+  }
+
+  .not-found::after {
+    inset: 12%;
+    transform: rotate(-12deg);
+    border-color: rgba(132, 101, 211, 0.18);
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.6;
+    background-image: radial-gradient(#f2dfb0 1px, transparent 1px);
+    background-size: 83px 97px;
+    mask-image: linear-gradient(to bottom, black, transparent 85%);
+  }
+
+  .portal {
+    display: grid;
+    width: 92px;
+    height: 92px;
+    place-items: center;
+    border: 1px solid rgba(242, 223, 176, 0.55);
+    border-radius: 50%;
+    box-shadow: 0 0 0 8px rgba(132, 101, 211, 0.08), 0 0 55px rgba(132, 101, 211, 0.7), inset 0 0 24px rgba(242, 223, 176, 0.3);
+    background: radial-gradient(circle, rgba(242, 223, 176, 0.28), rgba(84, 45, 137, 0.48) 42%, rgba(11, 8, 31, 0.9) 72%);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .portal span { font-size: 42px; font-weight: 700; }
+
+  .eyebrow {
+    margin: 28px 0 0;
+    color: #d39c55;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .code {
+    margin: 5px 0 0;
+    color: #f2dfb0;
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: clamp(110px, 23vw, 220px);
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: 12px;
+    text-shadow: 7px 7px 0 rgba(84, 45, 137, 0.75), 0 0 28px rgba(211, 156, 85, 0.45);
+  }
+
+  h1 {
+    max-width: 620px;
+    margin: 24px 0 10px;
+    font-size: clamp(21px, 4vw, 34px);
+    line-height: 1.15;
+  }
+
+  .message {
+    max-width: 500px;
+    margin: 0;
+    color: rgba(242, 223, 176, 0.76);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .home-button {
+    margin-top: 28px;
+    padding: 12px 22px;
+    border: 1px solid #d39c55;
+    border-radius: 3px;
+    background: #d39c55;
+    color: #170e21;
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: transform 180ms ease, background 180ms ease;
+  }
+
+  .home-button span { margin-left: 8px; font-size: 18px; }
+  .home-button:hover { background: #f2dfb0; transform: translateY(-2px); }
+
+  @keyframes pulse {
+    50% { transform: scale(1.05); box-shadow: 0 0 0 13px rgba(132, 101, 211, 0.04), 0 0 72px rgba(132, 101, 211, 0.82), inset 0 0 24px rgba(242, 223, 176, 0.3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) { .portal { animation: none; } }
+</style>

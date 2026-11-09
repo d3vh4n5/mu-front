@@ -1,0 +1,573 @@
+---
+import Main from '../components/Main.astro';
+import Layout from '../layouts/Layout.astro';
+import infoImg from '../assets/img/top-decorator.gif';
+import { Image } from 'astro:assets';
+
+const commands = [
+  ['/reset', 'Reiniciar el personaje'],
+  ['/pkclear', 'Quitar el estado PK'],
+  ['/addstr <pts>', 'Agregar fuerza'],
+  ['/addagi <pts>', 'Agregar agilidad'],
+  ['/addvit <pts>', 'Agregar vitalidad'],
+  ['/addene <pts>', 'Agregar energía'],
+  ['/addcmd <pts>', 'Agregar comando (DL)'],
+];
+---
+
+<Layout>
+  <Main>
+    <div class="container">
+      <Image src={infoImg} alt="" class:list="noticias" />
+
+      <div id="accountLoading" class="loading" role="status">Cargando tu cuenta...</div>
+
+      <div id="accountContent" hidden>
+        <p class="eyebrow">Área privada</p>
+        <h1>Mi cuenta</h1>
+
+        <section class="panel account-summary" aria-labelledby="welcome">
+          <h2 id="welcome">Hola</h2>
+          <dl class="summary-grid">
+            <div><dt>Usuario</dt><dd id="accUser">-</dd></div>
+            <div><dt>Correo</dt><dd id="accEmail">-</dd></div>
+            <div><dt>Nivel de cuenta</dt><dd><span id="accLevel" class="badge">FREE</span> <small id="accExpires"></small></dd></div>
+            <div><dt>Estado</dt><dd><span id="accStatus" class="status">-</span></dd></div>
+          </dl>
+          <p id="onlineWarning" class="warning" hidden>
+            Tu cuenta está conectada al juego. Desconectate para poder gestionar tus personajes desde la web.
+          </p>
+          <p id="rulesInfo" class="rules"></p>
+        </section>
+
+        <section aria-labelledby="charactersTitle">
+          <div class="section-title">
+            <h2 id="charactersTitle">Mis personajes</h2>
+            <button type="button" id="refreshAccount" class="link-button">Actualizar</button>
+          </div>
+          <p id="globalMessage" class="message" role="status" aria-live="polite"></p>
+          <div id="characters" class="characters"></div>
+        </section>
+
+        <details class="panel commands">
+          <summary>Comandos dentro del juego</summary>
+          <p class="note">Si estás conectado, podés hacer lo mismo desde el chat del juego:</p>
+          <div class="command-list">
+            {commands.map(([command, description]) => (
+              <div><code>{command}</code><span>{description}</span></div>
+            ))}
+          </div>
+          <a class="link" href="/help">Ver todos los comandos</a>
+        </details>
+
+        <section class="panel" aria-labelledby="supportTitle">
+          <h2 id="supportTitle">Enviar un ticket</h2>
+          <p>¿Encontraste un problema o necesitás ayuda? Envía un mensaje al equipo de desarrollo.</p>
+          <form id="supportForm" class="stack-form">
+            <label for="supportSubject">Asunto</label>
+            <input id="supportSubject" name="subject" type="text" placeholder="Ej: No puedo entrar al servidor" required>
+            <label for="supportMessage">Mensaje</label>
+            <textarea id="supportMessage" name="message" rows="5" placeholder="Contanos qué ocurrió..." required></textarea>
+            <button type="submit" class="btn">Preparar ticket</button>
+          </form>
+          <p class="support-note">Se abrirá tu aplicación de correo con el ticket listo para enviar.</p>
+        </section>
+      </div>
+
+      <div id="loginRequired" class="login-required" hidden>
+        <h1>Sesión requerida</h1>
+        <p>Ingresá con tu cuenta para gestionar tus personajes.</p>
+        <a class="btn" href="/">Volver al inicio</a>
+      </div>
+    </div>
+  </Main>
+</Layout>
+
+<style>
+  .container, .noticias { width: 100%; }
+  [hidden] { display: none !important; }
+
+  h1 { margin: 6px 0 18px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+  h2 { margin: 0 0 12px; color: var(--color-danger); font-size: 16px; }
+  section, details { margin-top: 18px; }
+
+  .eyebrow { margin: 18px 0 0; text-align: center; color: var(--color-danger); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .loading, .login-required { margin: 40px 0; text-align: center; }
+  .login-required p { margin-bottom: 18px; }
+
+  .panel {
+    padding: 16px;
+    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    border-radius: 5px;
+    background: var(--bg-transparent);
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px 16px;
+    margin: 0;
+  }
+  .summary-grid dt { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+  .summary-grid dd { margin: 3px 0 0; font-size: 13px; overflow-wrap: anywhere; }
+  .summary-grid small { opacity: 0.75; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid color-mix(in srgb, var(--fg) 50%, transparent);
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge.vip { border-color: var(--color-danger); color: var(--color-danger); }
+
+  .status::before { content: '●'; margin-right: 5px; }
+  .status.online { color: var(--color-succes); }
+  .status.offline { opacity: 0.8; }
+
+  .warning {
+    margin: 14px 0 0;
+    padding: 10px 12px;
+    border-left: 3px solid var(--color-danger);
+    background: rgba(255, 165, 0, 0.1);
+    line-height: 1.5;
+  }
+  .rules { margin: 12px 0 0; font-size: 11px; line-height: 1.6; opacity: 0.85; }
+
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .link-button {
+    border: 0; padding: 0; background: none; color: var(--fg);
+    font: inherit; font-size: 11px; text-decoration: underline; cursor: pointer;
+  }
+
+  .message { min-height: 0; margin: 8px 0; line-height: 1.5; }
+  .message:empty { display: none; }
+
+  .characters { display: grid; gap: 12px; }
+
+  .empty { padding: 20px; text-align: center; line-height: 1.6; }
+
+  .stack-form { display: grid; gap: 6px; max-width: 420px; }
+  .stack-form label { margin-top: 6px; font-size: 11px; font-weight: 700; }
+  .stack-form input, .stack-form textarea {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid color-mix(in srgb, var(--fg) 60%, transparent);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--fg);
+    font: inherit;
+  }
+  .stack-form textarea { resize: vertical; }
+  .stack-form input:focus, .stack-form textarea:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+  .stack-form small { font-size: 10px; opacity: 0.75; line-height: 1.4; }
+  .stack-form .btn { justify-self: start; margin-top: 8px; cursor: pointer; }
+
+  .commands summary { cursor: pointer; color: var(--color-danger); font-weight: 700; font-size: 14px; }
+  .note { border-left: 3px solid var(--color-danger); padding-left: 12px; line-height: 1.6; }
+  .command-list { display: grid; gap: 6px; margin: 12px 0; }
+  .command-list div {
+    display: flex; justify-content: space-between; gap: 16px; padding: 8px 10px;
+    border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent); border-radius: 4px;
+  }
+  code { color: var(--color-danger); }
+  .link { color: var(--fg); }
+  .support-note { font-size: 11px; opacity: 0.8; }
+
+  @media (max-width: 480px) {
+    .panel { padding: 12px; }
+    .command-list div { flex-direction: column; gap: 3px; }
+    .stack-form .btn { justify-self: stretch; text-align: center; }
+  }
+</style>
+
+<!-- Estilos de las tarjetas generadas por JS (sin scope de Astro) -->
+<style is:global>
+  .char-card {
+    padding: 14px;
+    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+    border-radius: 6px;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent 60%),
+      var(--bg-transparent);
+  }
+  .char-card.is-banned { opacity: 0.6; }
+
+  .char-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+  .char-name {
+    margin: 0; padding: 0; background: none; text-align: left;
+    color: var(--fg); font-size: 18px; letter-spacing: 0.5px;
+  }
+  .char-class { font-size: 12px; opacity: 0.85; }
+  .char-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .char-tag {
+    padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700;
+    background: rgba(0, 0, 0, 0.35); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent);
+  }
+  .char-tag.pk { border-color: var(--color-error); color: var(--color-error); }
+  .char-tag.ok { border-color: var(--color-succes); color: var(--color-succes); }
+
+  .char-info { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 10px 0; font-size: 11px; opacity: 0.9; }
+
+  .char-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+    gap: 6px;
+    margin: 10px 0;
+  }
+  .char-stat {
+    padding: 7px 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.3);
+    border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
+  }
+  .char-stat span { display: block; font-size: 10px; opacity: 0.75; }
+  .char-stat strong { font-size: 14px; }
+  .char-stat.free { border-color: var(--color-danger); }
+  .char-stat.free strong { color: var(--color-danger); }
+
+  .char-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .char-actions .btn { cursor: pointer; font-size: 12px; }
+  .char-actions .btn:disabled { cursor: not-allowed; opacity: 0.45; }
+  .btn-ghost {
+    background: transparent !important;
+    border: 1px solid color-mix(in srgb, var(--fg) 45%, transparent) !important;
+    color: var(--fg) !important;
+  }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--fg) !important; }
+  .char-hint { margin: 6px 0 0; font-size: 10px; opacity: 0.75; }
+
+  .points-form {
+    margin-top: 12px; padding: 12px; border-radius: 4px;
+    border: 1px dashed color-mix(in srgb, var(--fg) 35%, transparent);
+  }
+  .points-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+  .points-grid label { display: grid; gap: 4px; font-size: 10px; font-weight: 700; }
+  .points-grid input {
+    width: 100%; padding: 7px; border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent);
+    background: rgba(0, 0, 0, 0.3); color: var(--fg); font: inherit;
+  }
+  .points-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: 11px; }
+  .points-footer .btn { cursor: pointer; }
+  .points-remaining.over { color: var(--color-error); font-weight: 700; }
+
+  .char-message { margin: 10px 0 0; font-size: 12px; line-height: 1.5; }
+  .char-message:empty { display: none; }
+
+  @media (max-width: 480px) {
+    .char-card { padding: 12px; }
+    .char-actions .btn { flex: 1 1 calc(50% - 8px); text-align: center; }
+  }
+</style>
+
+<script>
+  type Stats = { strength: number; dexterity: number; vitality: number; energy: number; leadership: number };
+  type Character = {
+    name: string;
+    className: string;
+    isDarkLord: boolean;
+    level: number;
+    resets: number;
+    freePoints: number;
+    money: number;
+    stats: Stats;
+    pk: { level: number; count: number; isPk: boolean };
+    map: { name: string; x: number; y: number };
+    banned: boolean;
+    canReset: boolean;
+    resetBlockers: string[];
+  };
+  type Overview = {
+    account: { username: string; name: string; email: string; accountLevel: number; vipExpiresAt: string | null; online: boolean };
+    rules: { resetLevel: number; resetMoney: number; resetPoint: number; resetLimit: number; pkClearMoney: number; maxStatPoint: number };
+    characters: Character[];
+  };
+
+  const STAT_LABELS: [keyof Stats, string][] = [
+    ['strength', 'Fuerza'],
+    ['dexterity', 'Agilidad'],
+    ['vitality', 'Vitalidad'],
+    ['energy', 'Energía'],
+    ['leadership', 'Comando'],
+  ];
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+  const loading = $('accountLoading');
+  const content = $('accountContent');
+  const loginRequired = $('loginRequired');
+  const charactersEl = $('characters');
+  const globalMessage = $('globalMessage');
+
+  let state: Overview | null = null;
+  let openPointsFor: string | null = null;
+  const cardMessages = new Map<string, { text: string; type: 'success' | 'error' }>();
+
+  const fmt = (n: number) => n.toLocaleString('es-AR');
+  const esc = (value: unknown) =>
+    String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+  function getToken(): string | null {
+    try {
+      const session = JSON.parse(localStorage.getItem('mu-auth') || 'null');
+      if (session?.accessToken && session.expiresAt > Date.now()) return session.accessToken;
+    } catch { /* sesión corrupta */ }
+    localStorage.removeItem('mu-auth');
+    return null;
+  }
+
+  function showLoginRequired() {
+    localStorage.removeItem('mu-auth');
+    loading?.setAttribute('hidden', '');
+    content?.setAttribute('hidden', '');
+    loginRequired?.removeAttribute('hidden');
+  }
+
+  async function api<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+    const token = getToken();
+    if (!token) {
+      showLoginRequired();
+      throw new Error('Sesión expirada');
+    }
+    const response = await fetch(`/api/account${path}`, {
+      method: init?.method ?? 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: init?.body ? JSON.stringify(init.body) : undefined,
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.status === 401) {
+      showLoginRequired();
+      throw new Error('Tu sesión expiró. Volvé a ingresar.');
+    }
+    if (!response.ok) {
+      const message = Array.isArray(result.message) ? result.message.join('. ') : result.message;
+      throw new Error(message || result.error || 'No se pudo completar la acción');
+    }
+    return result as T;
+  }
+
+  function setMessage(el: HTMLElement | null, text: string, type: 'success' | 'error' | '' = '') {
+    if (!el) return;
+    el.textContent = text;
+    el.className = `message ${type}`.trim();
+  }
+
+  function renderSummary(data: Overview) {
+    const { account, rules } = data;
+    const welcome = $('welcome');
+    if (welcome) welcome.textContent = `Hola, ${account.name || account.username}`;
+    const user = $('accUser');
+    if (user) user.textContent = account.username;
+    const email = $('accEmail');
+    if (email) email.textContent = account.email || '-';
+
+    const level = $('accLevel');
+    if (level) {
+      level.textContent = account.accountLevel > 0 ? `VIP ${account.accountLevel}` : 'FREE';
+      level.classList.toggle('vip', account.accountLevel > 0);
+    }
+    const expires = $('accExpires');
+    if (expires) {
+      expires.textContent = account.vipExpiresAt
+        ? `vence el ${new Date(account.vipExpiresAt).toLocaleDateString('es-AR')}`
+        : '';
+    }
+
+    const status = $('accStatus');
+    if (status) {
+      status.textContent = account.online ? 'Conectado al juego' : 'Desconectado';
+      status.className = `status ${account.online ? 'online' : 'offline'}`;
+    }
+    $('onlineWarning')?.toggleAttribute('hidden', !account.online);
+
+    const rulesInfo = $('rulesInfo');
+    if (rulesInfo) {
+      rulesInfo.textContent =
+        `Reset: nivel ${rules.resetLevel} · ${fmt(rules.resetMoney)} zen · ${fmt(rules.resetPoint)} puntos por reset · máximo ${rules.resetLimit} resets. ` +
+        `Limpiar PK: ${fmt(rules.pkClearMoney)} zen.`;
+    }
+  }
+
+  function renderCharacter(c: Character, data: Overview) {
+    const online = data.account.online;
+    const locked = online || c.banned;
+    const lockedTitle = online ? 'Desconectate del juego para usar esta opción' : c.banned ? 'Personaje bloqueado' : '';
+    const stats = STAT_LABELS.filter(([key]) => key !== 'leadership' || c.isDarkLord);
+    const message = cardMessages.get(c.name);
+
+    const resetTitle = locked ? lockedTitle : c.canReset ? `Cuesta ${fmt(data.rules.resetMoney)} zen` : `Requiere: ${c.resetBlockers.join(', ')}`;
+    const pkTitle = locked ? lockedTitle : c.pk.isPk ? `Cuesta ${fmt(data.rules.pkClearMoney)} zen` : 'No tiene estado PK';
+
+    const pointsForm = openPointsFor === c.name ? `
+      <form class="points-form" data-points-form="${esc(c.name)}">
+        <div class="points-grid">
+          ${stats.map(([key, label]) => `
+            <label>${label}
+              <input type="number" name="${key}" min="0" max="${c.freePoints}" step="1" inputmode="numeric" placeholder="0">
+            </label>`).join('')}
+        </div>
+        <div class="points-footer">
+          <span class="points-remaining" data-remaining>Disponibles: ${fmt(c.freePoints)}</span>
+          <button type="submit" class="btn">Confirmar puntos</button>
+        </div>
+      </form>` : '';
+
+    return `
+      <article class="char-card ${c.banned ? 'is-banned' : ''}" data-character="${esc(c.name)}">
+        <div class="char-head">
+          <div>
+            <h3 class="char-name">${esc(c.name)}</h3>
+            <span class="char-class">${esc(c.className)}</span>
+          </div>
+          <div class="char-tags">
+            <span class="char-tag">Nivel ${c.level}</span>
+            <span class="char-tag">${c.resets} resets</span>
+            ${c.pk.isPk ? `<span class="char-tag pk">PK (${c.pk.count})</span>` : ''}
+            ${c.canReset && !locked ? '<span class="char-tag ok">Listo para reset</span>' : ''}
+            ${c.banned ? '<span class="char-tag pk">Bloqueado</span>' : ''}
+          </div>
+        </div>
+        <div class="char-info">
+          <span>📍 ${esc(c.map.name)} (${c.map.x}, ${c.map.y})</span>
+          <span>💰 ${fmt(c.money)} zen</span>
+        </div>
+        <div class="char-stats">
+          ${stats.map(([key, label]) => `<div class="char-stat"><span>${label}</span><strong>${fmt(c.stats[key])}</strong></div>`).join('')}
+          <div class="char-stat free"><span>Puntos libres</span><strong>${fmt(c.freePoints)}</strong></div>
+        </div>
+        <div class="char-actions">
+          <button type="button" class="btn btn-success" data-action="reset" ${locked || !c.canReset ? 'disabled' : ''} title="${esc(resetTitle)}">Reset</button>
+          <button type="button" class="btn" data-action="points" ${locked || c.freePoints <= 0 ? 'disabled' : ''} title="${esc(locked ? lockedTitle : c.freePoints > 0 ? 'Repartir puntos libres' : 'No tenés puntos libres')}">${openPointsFor === c.name ? 'Cerrar puntos' : 'Agregar puntos'}</button>
+          <button type="button" class="btn btn-ghost" data-action="pk-clear" ${locked || !c.pk.isPk ? 'disabled' : ''} title="${esc(pkTitle)}">Limpiar PK</button>
+          <button type="button" class="btn btn-ghost" data-action="unstuck" ${locked ? 'disabled' : ''} title="${esc(locked ? lockedTitle : 'Mover a Lorencia')}">Desbloquear</button>
+        </div>
+        ${!c.canReset && !locked ? `<p class="char-hint">Para resetear te falta: ${esc(c.resetBlockers.join(' · '))}</p>` : ''}
+        ${pointsForm}
+        <p class="char-message ${message?.type ?? ''}" role="status" aria-live="polite">${esc(message?.text ?? '')}</p>
+      </article>`;
+  }
+
+  function render() {
+    if (!state || !charactersEl) return;
+    renderSummary(state);
+    charactersEl.innerHTML = state.characters.length
+      ? state.characters.map((c) => renderCharacter(c, state!)).join('')
+      : '<div class="panel empty">Todavía no tenés personajes. Entrá al juego y creá el primero.</div>';
+  }
+
+  async function loadAccount() {
+    try {
+      state = await api<Overview>('');
+      loading?.setAttribute('hidden', '');
+      content?.removeAttribute('hidden');
+      render();
+    } catch (error) {
+      if (!getToken()) return;
+      loading?.setAttribute('hidden', '');
+      content?.removeAttribute('hidden');
+      setMessage(globalMessage, error instanceof Error ? error.message : 'No se pudo cargar la cuenta', 'error');
+    }
+  }
+
+  function replaceCharacter(updated: Character | null) {
+    if (!state || !updated) return;
+    state.characters = state.characters.map((c) => (c.name === updated.name ? updated : c));
+  }
+
+  async function runAction(name: string, action: string, body?: unknown) {
+    const card = charactersEl?.querySelector<HTMLElement>(`[data-character="${CSS.escape(name)}"]`);
+    card?.querySelectorAll('button').forEach((b) => (b.disabled = true));
+    try {
+      const result = await api<{ message: string; character: Character | null }>(
+        `/characters/${encodeURIComponent(name)}/${action}`,
+        { method: 'POST', body },
+      );
+      replaceCharacter(result.character);
+      cardMessages.set(name, { text: result.message, type: 'success' });
+      if (action === 'add-points') openPointsFor = null;
+    } catch (error) {
+      cardMessages.set(name, { text: error instanceof Error ? error.message : 'Error', type: 'error' });
+      // El estado online pudo haber cambiado: refrescamos
+      if (error instanceof Error && /conectada/.test(error.message) && state) state.account.online = true;
+    }
+    render();
+  }
+
+  charactersEl?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-action]');
+    if (!button || button.disabled || !state) return;
+    const name = button.closest<HTMLElement>('[data-character]')?.dataset.character;
+    if (!name) return;
+    const { rules } = state;
+
+    cardMessages.delete(name);
+    switch (button.dataset.action) {
+      case 'reset':
+        if (confirm(`¿Resetear a ${name}?\n\nSe cobrarán ${fmt(rules.resetMoney)} zen, volverá a nivel 1 con los stats base y se moverá a Lorencia.`)) {
+          runAction(name, 'reset');
+        }
+        break;
+      case 'points':
+        openPointsFor = openPointsFor === name ? null : name;
+        render();
+        charactersEl.querySelector<HTMLInputElement>(`[data-points-form="${CSS.escape(name)}"] input`)?.focus();
+        break;
+      case 'pk-clear':
+        if (confirm(`¿Limpiar el PK de ${name}? Se cobrarán ${fmt(rules.pkClearMoney)} zen.`)) runAction(name, 'pk-clear');
+        break;
+      case 'unstuck':
+        if (confirm(`¿Mover a ${name} a Lorencia?`)) runAction(name, 'unstuck');
+        break;
+    }
+  });
+
+  charactersEl?.addEventListener('input', (event) => {
+    const form = (event.target as HTMLElement).closest<HTMLFormElement>('[data-points-form]');
+    const character = state?.characters.find((c) => c.name === form?.dataset.pointsForm);
+    if (!form || !character) return;
+    const used = [...form.querySelectorAll<HTMLInputElement>('input')].reduce((sum, i) => sum + (Number(i.value) || 0), 0);
+    const remaining = character.freePoints - used;
+    const label = form.querySelector<HTMLElement>('[data-remaining]');
+    if (label) {
+      label.textContent = `Disponibles: ${fmt(remaining)}`;
+      label.classList.toggle('over', remaining < 0);
+    }
+  });
+
+  charactersEl?.addEventListener('submit', (event) => {
+    const form = (event.target as HTMLElement).closest<HTMLFormElement>('[data-points-form]');
+    if (!form) return;
+    event.preventDefault();
+    const name = form.dataset.pointsForm!;
+    const body: Record<string, number> = {};
+    form.querySelectorAll<HTMLInputElement>('input').forEach((input) => {
+      const value = Math.floor(Number(input.value) || 0);
+      if (value > 0) body[input.name] = value;
+    });
+    if (!Object.keys(body).length) {
+      cardMessages.set(name, { text: 'Indicá cuántos puntos querés agregar', type: 'error' });
+      render();
+      return;
+    }
+    runAction(name, 'add-points', body);
+  });
+
+  $('refreshAccount')?.addEventListener('click', () => {
+    cardMessages.clear();
+    setMessage(globalMessage, '');
+    loadAccount();
+  });
+
+  $('supportForm')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget as HTMLFormElement);
+    const account = state?.account;
+    const subject = encodeURIComponent(`[Soporte] ${data.get('subject')}`);
+    const body = encodeURIComponent(
+      `Usuario: ${account?.username ?? ''}\nCorreo: ${account?.email ?? ''}\nNivel de cuenta: ${account?.accountLevel ?? 0}\n\n${data.get('message')}`,
+    );
+    window.location.href = `mailto:soporte@mu-campana.com?subject=${subject}&body=${body}`;
+  });
+
+  if (getToken()) loadAccount();
+  else showLoginRequired();
+</script>

@@ -38,7 +38,7 @@ import Text from '../components/ui/Text.astro';
 					<li><strong>Versión:</strong> 99b + DL</li>
 					<li><strong>Experiencia:</strong> x100</li>
 					<li><strong>Drop:</strong> 40%</li>
-					<li><strong>Reset:</strong> 400 puntos (borra stats)</li>
+					<li><strong>Reset:</strong> nivel 400 · 5kk zen · 400 puntos por reset (borra stats)</li>
 					<li><strong>Máx resets:</strong> 300</li>
 					<li><strong>Máx stats:</strong> 32767</li>
 					<li><strong>Eventos:</strong> BC, DS, CC, Invasiones</li>
@@ -77,6 +77,11 @@ import Text from '../components/ui/Text.astro';
 <style>
 	h1{
 		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	}
+
+	marquee :global(.gradient-text-hot) {
+		display: inline-block;
+		white-space: nowrap;
 	}
 
 	.getting-started p {

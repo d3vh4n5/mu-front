@@ -1,8 +1,8 @@
 ---
-import { Image } from "astro:assets";
-import eventsImg from "../assets/img/events.png"
+import EventBanners from "./EventBanners.astro";
 import RankTable from "./RankTable.astro";
 import OnlinePlayers from "./OnlinePlayers.astro";
+import LoginWidget from "./LoginWidget.astro";
 ---
 
 <main id="container" class="bg-blur">
@@ -13,14 +13,9 @@ import OnlinePlayers from "./OnlinePlayers.astro";
 		<div class="right-container">
 
 			<OnlinePlayers/>
-			<hr>
+			<LoginWidget />
 			<RankTable/>
-			<hr>
-			<Image
-				src={eventsImg}
-				alt="Imagen principal"
-				class:list={"hero-img"}
-			/>
+			<EventBanners />
 		</div>
 	</section>
 </main>
@@ -65,5 +60,72 @@ import OnlinePlayers from "./OnlinePlayers.astro";
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		gap: 16px;
+	}
+
+	.right-container > :global(*) {
+		max-width: 100%;
+	}
+
+	.right-container :global(.mu-box) {
+		margin: 0;
+	}
+
+	.right-container :global(.mu-table th),
+	.right-container :global(.mu-table td) {
+		padding: 7px 5px;
+		text-align: left;
+	}
+
+	/* Columna "#" angosta; las numéricas a la derecha */
+	.right-container :global(.mu-table th:first-child),
+	.right-container :global(.mu-table td:first-child) {
+		width: 1.8em;
+		text-align: center;
+	}
+
+	.right-container :global(.mu-table th:nth-child(n+3)),
+	.right-container :global(.mu-table td:nth-child(n+3)) {
+		width: 3.5em;
+		text-align: right;
+	}
+
+	.right-container :global(.mu-table td:nth-child(2)) {
+		overflow-wrap: anywhere;
+	}
+
+
+	@media (max-width: 760px) {
+		main {
+			flex-direction: column;
+			padding: 8px 0;
+			border-radius: 10px;
+			transform: translateY(-6vh);
+		}
+
+		.mid,
+		.right {
+			padding: 14px 16px;
+		}
+
+		.right {
+			border-top: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+		}
+
+		.right-container {
+			max-width: 480px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 480px) {
+		main {
+			border-radius: 0;
+		}
+
+		.mid,
+		.right {
+			padding: 12px;
+		}
 	}
 </style>

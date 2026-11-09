@@ -17,6 +17,23 @@
     --color-brown: #461303;
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
 html,
 body {
     margin: 0;
@@ -38,6 +55,29 @@ h3 {
     text-align: center;
     background: linear-gradient(90deg, var(--color-primary), var(--color-danger), var(--color-brown));
     color: var(--bg);
+}
+
+h1 {
+    font-size: clamp(20px, 5vw, 24px);
+    overflow-wrap: anywhere;
+}
+
+p, li, td {
+    overflow-wrap: break-word;
+}
+
+.cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+@media (max-width: 480px) {
+    .cta .btn {
+        flex: 1 1 100%;
+        text-align: center;
+    }
 }
 
 .error { color: var(--color-error) !important; }

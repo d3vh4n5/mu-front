@@ -1,10 +1,12 @@
 ---
 import { Image } from "astro:assets"
 import heroImg from '../assets/img/hero2.jpg';
+import { config } from "../constants/config";
 
 const pages = [
     { path: "/", name: "Inicio" },
     { path: "/register", name: "Crear cuenta" },
+    { path: "/account", name: "Mi cuenta", id: "accountLink", hidden: true },
     { path: "/downloads", name: "Bajar Mu" },
     { path: "/help", name: "Mu manual" },
     { path: "/vip", name: "VIP" },
@@ -13,13 +15,26 @@ const pages = [
 ---
 
 <header>
-    <nav class="bg-blur">
-        <ul>
+    <nav class="bg-blur" aria-label="Principal">
+        <div class="nav-bar">
+            <a href="/" class="brand">{config.project.alias}</a>
+            <button
+                type="button"
+                class="menu-toggle"
+                aria-expanded="false"
+                aria-controls="navMenu"
+                aria-label="Abrir menú"
+            >
+                <span aria-hidden="true"></span>
+            </button>
+        </div>
+        <ul id="navMenu">
             {
-                pages.map( page => (<li>
+                pages.map( page => (<li id={page.id} hidden={page.hidden}>
                     <a href={page.path}>{page.name}</a>
                 </li>) )
             }
+            <li id="logoutLink" hidden><button type="button">Cerrar sesión</button></li>
         </ul>
     </nav>
     <div class="container">
@@ -60,6 +75,59 @@ const pages = [
         color: var(--fg);
     }
 
+    li[hidden] { display: none; }
+
+    button {
+        border: 0;
+        padding: 0;
+        background: transparent;
+        color: var(--fg);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    .nav-bar {
+        display: none;
+    }
+
+    .brand {
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .menu-toggle {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+    }
+
+    .menu-toggle span,
+    .menu-toggle span::before,
+    .menu-toggle span::after {
+        position: absolute;
+        left: 8px;
+        width: 20px;
+        height: 2px;
+        background: var(--fg);
+        transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .menu-toggle span { top: 17px; }
+    .menu-toggle span::before,
+    .menu-toggle span::after {
+        content: '';
+        left: 0;
+    }
+    .menu-toggle span::before { top: -6px; }
+    .menu-toggle span::after { top: 6px; }
+
+    nav.open .menu-toggle span { background: transparent; }
+    nav.open .menu-toggle span::before { transform: translateY(6px) rotate(45deg); }
+    nav.open .menu-toggle span::after { transform: translateY(-6px) rotate(-45deg); }
+
     .container {
         margin: 0 auto;
         width: 100%;
@@ -69,6 +137,98 @@ const pages = [
     .hero-img {
         width: 100%;
         height: 100%;
+        object-fit: cover;
         mask-image: linear-gradient(#000 60%, #0000)
     }
+
+    @media (max-width: 820px) {
+        ul {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 16px;
+        }
+    }
+
+    @media (max-width: 640px) {
+        nav {
+            padding: 6px 16px;
+            border-radius: 0;
+        }
+
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        ul {
+            display: none;
+            flex-direction: column;
+            gap: 0;
+            padding: 6px 0 4px;
+        }
+
+        nav.open ul {
+            display: flex;
+        }
+
+        li a,
+        li button {
+            display: block;
+            width: 100%;
+            padding: 12px 4px;
+            text-align: left;
+            border-top: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
+            font-size: 14px;
+        }
+
+        .container {
+            height: 32vh;
+            min-height: 180px;
+        }
+    }
 </style>
+
+<script>
+    const accountLink = document.getElementById('accountLink');
+    const logoutLink = document.getElementById('logoutLink');
+    const auth = localStorage.getItem('mu-auth');
+
+    try {
+        const session = auth ? JSON.parse(auth) : null;
+        if (session?.accessToken && session.expiresAt > Date.now()) {
+            accountLink?.removeAttribute('hidden');
+            logoutLink?.removeAttribute('hidden');
+        } else if (auth) {
+            localStorage.removeItem('mu-auth');
+        }
+    } catch {
+        localStorage.removeItem('mu-auth');
+    }
+
+    const nav = document.querySelector('header nav');
+    const menuToggle = nav?.querySelector<HTMLButtonElement>('.menu-toggle');
+
+    const setMenuOpen = (open: boolean) => {
+        nav?.classList.toggle('open', open);
+        menuToggle?.setAttribute('aria-expanded', String(open));
+        menuToggle?.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    };
+
+    menuToggle?.addEventListener('click', () => {
+        setMenuOpen(!nav?.classList.contains('open'));
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') setMenuOpen(false);
+    });
+
+    document.addEventListener('click', (event) => {
+        if (nav && !nav.contains(event.target as Node)) setMenuOpen(false);
+    });
+
+    document.querySelector('#logoutLink button')?.addEventListener('click', () => {
+        localStorage.removeItem('mu-auth');
+        window.location.href = '/';
+    });
+</script>
