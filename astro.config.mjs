@@ -6,6 +6,7 @@ import vercelAdapter from '@astrojs/vercel';
 import preact from '@astrojs/preact';
 
 const require = createRequire(import.meta.url);
+const isBuild = process.argv.includes('build');
 
 /** Nombre del paquete y todas sus dependencias (transitivas). */
 function dependencyTree(name, seen = new Set()) {
@@ -33,7 +34,9 @@ export default defineConfig({
         // Vercel (/opt/rust/nodejs.js) no soporta require(esm) aunque el runtime sea
         // Node 24, así que empaquetamos sanitize-html y todo su árbol en el bundle SSR
         // para que Rollup resuelva la interop CJS/ESM en build.
-        noExternal: [...dependencyTree('sanitize-html')],
+        // Solo en build: en `astro dev` el module runner de Vite no tiene `require`
+        // y al inlinear sanitize-html tira "require is not defined".
+        noExternal: isBuild ? [...dependencyTree('sanitize-html')] : [],
       },
     },
 });

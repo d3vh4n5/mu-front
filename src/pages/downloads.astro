@@ -6,8 +6,8 @@ import { Image } from 'astro:assets';
 
 const clientUrl = 'https://drive.google.com/file/d/1_X_XNBpP-w-5dUe3yh1TLNZICZJFLFI6/view?usp=sharing';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// Captura del launcher. Guardala en public/img/launcher.png y cambiá esto a '/img/launcher.png'.
+const launcherImg: string | null = null;
 ---
 
 <Layout>
@@ -29,18 +29,80 @@ const clientUrl = 'https://drive.google.com/file/d/1_X_XNBpP-w-5dUe3yh1TLNZICZJF
 				</div>
 
 				<div class="download-details">
-					<h3>Como instalar</h3>
-					<ol>
-						<li>Descarga el archivo del cliente desde Google Drive.</li>
-						<li>Descomprime el archivo en una carpeta de tu computadora.</li>
-						<li>Abre el launcher o ejecutable del cliente para iniciar el juego.</li>
+					<h3>Cómo empezar a jugar</h3>
+					<ol class="steps">
+						<li>
+							<strong>Crea tu cuenta</strong> desde <a href="/register">Crear cuenta</a>.
+						</li>
+						<li>
+							<strong>Descarga el cliente</strong> con el botón de arriba (Google Drive).
+						</li>
+						<li>
+							<strong>Descomprime el archivo</strong> en una carpeta propia, por ejemplo
+							<code>C:\Juegos\MU Campana</code>. Evita <em>Archivos de programa</em> y el Escritorio
+							sincronizado con OneDrive: pueden bloquear las actualizaciones.
+						</li>
+						<li>
+							<strong>Abre <code>launcher.exe</code></strong>. Siempre entra al juego desde el launcher,
+							no desde <code>main.exe</code>.
+						</li>
+						<li>
+							<strong>Acepta los permisos de administrador</strong> cuando Windows los pida (ver abajo).
+						</li>
+						<li>
+							Toca <strong>Verificar y Actualizar Cliente</strong> y espera a que diga
+							<em>"¡Cliente actualizado! Ya podés jugar."</em>
+						</li>
+						<li>
+							Elige resolución, modo ventana e idioma si quieres, y presiona <strong>JUGAR</strong>.
+						</li>
 					</ol>
 
-					<h3>Antes de jugar</h3>
+					{launcherImg && (
+						<figure class="shot">
+							<img src={launcherImg} alt="Ventana del launcher de MU Campana" loading="lazy" />
+							<figcaption>El launcher: arriba las opciones, abajo los botones para actualizar y jugar.</figcaption>
+						</figure>
+					)}
+
+					<h3>Permisos de administrador</h3>
+					<p>
+						El launcher necesita permisos de administrador para poder <strong>actualizarse a sí mismo
+						y actualizar los archivos del juego</strong>. Cada vez que lo abras, Windows te va a preguntar
+						<em>"¿Quieres permitir que esta aplicación haga cambios en el dispositivo?"</em>: elige
+						<strong>Sí</strong>. Si eliges No, el launcher no abre.
+					</p>
+
+					<h3>Si Windows bloquea el launcher</h3>
+					<p>
+						La primera vez puede aparecer una pantalla azul/violeta que dice
+						<em>"Windows protegió su PC"</em> (<em>"Windows protected your PC"</em>). Aparece porque el
+						launcher no tiene firma digital paga, no porque sea peligroso. Para abrirlo:
+					</p>
+					<div class="shots">
+						<figure class="shot">
+							<img src="/img/more-info.png" alt="Aviso de Windows SmartScreen con el enlace Más información" loading="lazy" />
+							<figcaption><strong>1.</strong> Haz clic en <em>Más información</em> (<em>More info</em>).</figcaption>
+						</figure>
+						<figure class="shot">
+							<img src="/img/run-anyway.png" alt="Aviso de Windows SmartScreen con el botón Ejecutar de todas formas" loading="lazy" />
+							<figcaption><strong>2.</strong> Haz clic en <em>Ejecutar de todas formas</em> (<em>Run anyway</em>).</figcaption>
+						</figure>
+					</div>
+					<p>
+						Si el antivirus borra o pone en cuarentena el <code>launcher.exe</code>, restáuralo y agrega la
+						carpeta del juego a las exclusiones del antivirus.
+					</p>
+
+					<h3>Problemas comunes</h3>
 					<ul>
-						<li>Crea tu cuenta desde <a href="/register">Crear cuenta</a>.</li>
-						<li>Usa una carpeta propia para el cliente y evita instalarlo dentro de Archivos de programa.</li>
-						<li>Mantén el cliente actualizado para evitar problemas de conexión.</li>
+						<li>
+							<strong>"Version dismatch" o no puedes conectarte:</strong> tu cliente está desactualizado.
+							Abre el launcher y toca <em>Verificar y Actualizar Cliente</em>.
+						</li>
+						<li>
+							<strong>El launcher no abre:</strong> asegúrate de haber aceptado el permiso de administrador.
+						</li>
 					</ul>
 				</div>
 			</section>
@@ -97,5 +159,43 @@ const clientUrl = 'https://drive.google.com/file/d/1_X_XNBpP-w-5dUe3yh1TLNZICZJF
 
 	.download-details a {
 		color: var(--fg);
+	}
+
+	.download-details code {
+		padding: 1px 5px;
+		border-radius: 3px;
+		background: color-mix(in srgb, var(--fg) 12%, transparent);
+		font-size: 0.9em;
+	}
+
+	.shots {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 16px;
+		margin: 16px 0;
+	}
+
+	.shot {
+		margin: 16px 0;
+	}
+
+	.shots .shot {
+		margin: 0;
+	}
+
+	.shot img {
+		display: block;
+		width: 100%;
+		max-width: 560px;
+		height: auto;
+		margin: 0 auto;
+		border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
+		border-radius: 5px;
+	}
+
+	.shot figcaption {
+		margin-top: 8px;
+		font-size: 0.9em;
+		text-align: center;
 	}
 </style>
