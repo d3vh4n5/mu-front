@@ -7,11 +7,14 @@ export const runtime = 'nodejs';
 // Solo estas rutas se reenvían a la API (/api/v2/admin/...).
 // La autorización real (rol admin verificado en la base) la hace la API.
 const ALLOWED: Record<string, RegExp[]> = {
-  GET: [/^search$/, /^online$/, /^audit$/, /^updates$/, /^accounts\/[^/]{1,10}$/],
+  GET: [/^search$/, /^online$/, /^audit$/, /^updates$/, /^accounts\/[^/]{1,10}$/, /^news$/, /^news\/\d{1,9}$/],
   POST: [
     /^accounts\/[^/]{1,10}\/(ban|unban|vip)$/,
     /^characters\/[^/]{1,10}\/(ban|unban|gm|ungm)$/,
+    /^news$/,
   ],
+  PUT: [/^news\/\d{1,9}$/],
+  DELETE: [/^news\/\d{1,9}$/],
 };
 
 const forward: APIRoute = async ({ params, request, cookies, clientAddress }) => {
@@ -35,3 +38,5 @@ const forward: APIRoute = async ({ params, request, cookies, clientAddress }) =>
 
 export const GET = forward;
 export const POST = forward;
+export const PUT = forward;
+export const DELETE = forward;

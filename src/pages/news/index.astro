@@ -1,0 +1,43 @@
+---
+import Main from '../../components/Main.astro';
+import Layout from '../../layouts/Layout.astro';
+import NewsList from '../../components/NewsList.astro';
+import { fetchNewsPage } from '../../lib/server/news';
+
+const PAGE_SIZE = 10;
+const requested = Number.parseInt(Astro.url.searchParams.get('page') ?? '1', 10);
+const page = Number.isFinite(requested) && requested > 0 ? Math.min(requested, 1000) : 1;
+const data = await fetchNewsPage(page, PAGE_SIZE);
+---
+
+<Layout>
+  <Main>
+    <section class="news-page">
+      <div class="page-heading">
+        <p class="eyebrow">Mu Campana</p>
+        <h1>Noticias</h1>
+        <p>Novedades, eventos y mantenimientos del servidor.</p>
+      </div>
+
+      {data === null && <p class="news-empty">No se pudieron cargar las noticias. Probá de nuevo en unos minutos.</p>}
+      {data && data.items.length === 0 && <p class="news-empty">Todavía no hay noticias publicadas.</p>}
+      {data && data.items.length > 0 && <NewsList items={data.items} />}
+
+      {data && data.pages > 1 && (
+        <nav class="pager" aria-label="Páginas de noticias">
+          {data.page > 1 ? <a class="btn" href={`/news?page=${data.page - 1}`}>← Más nuevas</a> : <span></span>}
+          <span>Página {data.page} de {data.pages}</span>
+          {data.page < data.pages ? <a class="btn" href={`/news?page=${data.page + 1}`}>Más viejas →</a> : <span></span>}
+        </nav>
+      )}
+    </section>
+  </Main>
+</Layout>
+
+<style>
+  .news-page { width: 100%; }
+  .page-heading { text-align: center; }
+  .eyebrow { margin: 0; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
+  .news-empty { text-align: center; opacity: 0.75; margin: 24px 0; }
+  .pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 16px; font-size: 13px; }
+</style>

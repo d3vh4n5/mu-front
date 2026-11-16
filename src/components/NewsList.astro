@@ -1,0 +1,58 @@
+---
+import { categoryLabel, formatNewsDate, type PublicNews } from '../lib/news';
+
+interface Props {
+  items: PublicNews[];
+  /** Muestra la imagen de cada noticia (en el inicio se omite para que sea compacto). */
+  showImages?: boolean;
+}
+
+const { items, showImages = true } = Astro.props;
+---
+
+<ul class="news-list">
+  {items.map((news) => (
+    <li>
+      <a class="news-card" href={`/news/${news.id}`}>
+        {showImages && news.imageUrl && (
+          <img class="news-thumb" src={news.imageUrl} alt="" loading="lazy" referrerpolicy="no-referrer" />
+        )}
+        <div class="news-body">
+          <div class="news-meta">
+            <span class={`news-cat cat-${news.category}`}>{categoryLabel(news.category)}</span>
+            {news.pinned && <span class="news-pin" title="Fijada">📌</span>}
+            <time datetime={news.publishedAt}>{formatNewsDate(news.publishedAt)}</time>
+          </div>
+          <h4>{news.title}</h4>
+          <p>{news.summary}</p>
+        </div>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .news-list { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 10px; }
+  .news-card {
+    display: flex; gap: 12px; padding: 12px; border-radius: 6px; text-decoration: none; color: var(--fg);
+    border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); background: var(--bg-transparent);
+    transition: border-color 0.15s;
+  }
+  .news-card:hover, .news-card:focus-visible { border-color: var(--color-danger); outline: none; }
+  .news-thumb { width: 120px; height: 80px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
+  .news-body { min-width: 0; }
+  .news-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; opacity: 0.85; }
+  .news-cat {
+    padding: 1px 7px; border-radius: 3px; border: 1px solid currentColor; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px;
+  }
+  .cat-novedad { color: var(--color-succes); }
+  .cat-evento { color: var(--color-danger); }
+  .cat-mantenimiento { color: var(--color-error); }
+  .news-card h4 { margin: 6px 0 4px; font-size: 16px; color: var(--fg); overflow-wrap: anywhere; }
+  .news-card p { margin: 0; font-size: 13px; opacity: 0.8; overflow-wrap: anywhere; }
+  @media (max-width: 520px) {
+    .news-card { flex-direction: column; }
+    .news-thumb { width: 100%; height: 140px; }
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import Main from '../../components/Main.astro';
+import Layout from '../../layouts/Layout.astro';
+import { fetchNews, renderNewsMarkdown } from '../../lib/server/news';
+import { categoryLabel, formatNewsDate } from '../../lib/news';
+
+const id = Number.parseInt(Astro.params.id ?? '', 10);
+const news = Number.isInteger(id) && id > 0 ? await fetchNews(id) : null;
+if (!news) Astro.response.status = 404;
+const html = news ? renderNewsMarkdown(news.content) : '';
+---
+
+<Layout>
+  <Main>
+    <article class="news-article">
+      <a class="back" href="/news">← Todas las noticias</a>
+      {news ? (
+        <>
+          <div class="news-meta">
+            <span class={`news-cat cat-${news.category}`}>{categoryLabel(news.category)}</span>
+            <time datetime={news.publishedAt}>{formatNewsDate(news.publishedAt)}</time>
+          </div>
+          <h1>{news.title}</h1>
+          {news.imageUrl && <img class="news-image" src={news.imageUrl} alt="" referrerpolicy="no-referrer" />}
+          <div class="news-content" set:html={html} />
+        </>
+      ) : (
+        <>
+          <h1>Noticia no encontrada</h1>
+          <p>Puede que se haya despublicado o que el link sea incorrecto.</p>
+        </>
+      )}
+    </article>
+  </Main>
+</Layout>
+
+<style>
+  .news-article { width: 100%; overflow-wrap: anywhere; }
+  .back { font-size: 13px; }
+  .news-article h1 { margin: 8px 0 14px; }
+  .news-meta { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 12px; opacity: 0.85; }
+  .news-cat {
+    padding: 1px 7px; border-radius: 3px; border: 1px solid currentColor; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px;
+  }
+  .cat-novedad { color: var(--color-succes); }
+  .cat-evento { color: var(--color-danger); }
+  .cat-mantenimiento { color: var(--color-error); }
+  .news-image { width: 100%; max-height: 360px; object-fit: cover; border-radius: 6px; margin-bottom: 14px; }
+  .news-content { line-height: 1.6; }
+  .news-content :global(blockquote) {
+    margin: 10px 0; padding: 6px 12px; border-left: 3px solid var(--color-danger); background: var(--bg-transparent);
+  }
+  .news-content :global(pre) { overflow-x: auto; padding: 10px; background: rgba(0, 0, 0, 0.4); border-radius: 4px; }
+  .news-content :global(table) { border-collapse: collapse; width: 100%; }
+  .news-content :global(th), .news-content :global(td) {
+    border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); padding: 6px 8px; text-align: left;
+  }
+</style>

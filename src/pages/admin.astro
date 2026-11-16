@@ -26,6 +26,7 @@ import Layout from '../layouts/Layout.astro';
         <button type="button" role="tab" class="tab" data-tab="online" aria-selected="false">Online</button>
         <button type="button" role="tab" class="tab" data-tab="audit" aria-selected="false">Auditoría</button>
         <button type="button" role="tab" class="tab" data-tab="updates" aria-selected="false">Actualizaciones</button>
+        <button type="button" role="tab" class="tab" data-tab="news" aria-selected="false">Noticias</button>
       </nav>
 
       <p id="flash" class="flash" role="status" aria-live="polite"></p>
@@ -63,6 +64,55 @@ import Layout from '../layouts/Layout.astro';
           <button type="button" class="link-button" id="refreshUpdates">Actualizar</button>
         </div>
         <div id="updatesStatus"></div>
+      </section>
+
+      <section data-panel="news" class="panel" hidden>
+        <div class="panel-title">
+          <h2>Noticias</h2>
+          <div class="row-actions">
+            <button type="button" class="link-button" id="refreshNews">Actualizar</button>
+            <button type="button" class="btn" id="newNews">+ Nueva noticia</button>
+          </div>
+        </div>
+
+        <form id="newsForm" class="detail news-form" hidden novalidate>
+          <h3 id="newsFormTitle">Nueva noticia</h3>
+          <label>Título
+            <input name="title" type="text" required minlength="3" maxlength="120" autocomplete="off">
+          </label>
+          <div class="news-form-row">
+            <label>Categoría
+              <select name="category">
+                <option value="novedad">Novedad</option>
+                <option value="evento">Evento</option>
+                <option value="mantenimiento">Mantenimiento</option>
+              </select>
+            </label>
+            <label>Fecha de publicación <small>(vacía = al publicar)</small>
+              <input name="publishedAt" type="datetime-local">
+            </label>
+          </div>
+          <label>Resumen <small>(opcional, para listados; si queda vacío se usa el inicio del contenido)</small>
+            <textarea name="summary" rows="2" maxlength="300"></textarea>
+          </label>
+          <label>Contenido <small>(Markdown: **negrita**, *cursiva*, - listas, ## subtítulo, [texto](https://link))</small>
+            <textarea name="content" rows="10" required maxlength="20000"></textarea>
+          </label>
+          <label>Imagen <small>(opcional, URL https de una imagen ya publicada)</small>
+            <input name="imageUrl" type="url" maxlength="500" placeholder="https://..." autocomplete="off">
+          </label>
+          <div class="news-form-row checks">
+            <label class="check"><input name="published" type="checkbox"> Publicada</label>
+            <label class="check"><input name="pinned" type="checkbox"> Fijada arriba</label>
+          </div>
+          <p id="newsFormError" class="error"></p>
+          <div class="dialog-actions">
+            <button type="button" class="btn btn-ghost" id="newsCancel">Cancelar</button>
+            <button type="submit" class="btn" id="newsSave">Guardar</button>
+          </div>
+        </form>
+
+        <div id="newsList"></div>
       </section>
     </div>
 
@@ -235,6 +285,25 @@ import Layout from '../layouts/Layout.astro';
   .notice.warn { color: var(--color-danger); }
   .notice.bad { color: var(--color-error); }
   .notice.ok { color: var(--color-succes); }
+
+  .news-form { display: grid; gap: 10px; margin: 0 0 14px; }
+  .news-form h3 { margin: 0; padding: 0; background: none; text-align: left; color: var(--fg); font-size: 16px; }
+  .news-form label { display: grid; gap: 4px; font-size: 11px; font-weight: 700; }
+  .news-form small { font-weight: 400; opacity: 0.7; }
+  .news-form input[type="text"], .news-form input[type="url"], .news-form input[type="datetime-local"],
+  .news-form select, .news-form textarea {
+    padding: 8px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent);
+    background: #120c1c; color: var(--fg); font: inherit; font-weight: 400; font-size: 13px;
+  }
+  .news-form textarea { resize: vertical; }
+  .news-form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .news-form-row.checks { display: flex; gap: 18px; }
+  .news-form .check { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+  .news-form .error { margin: 0; color: var(--color-error); font-size: 12px; }
+  .news-form .error:empty { display: none; }
+  .st-published { color: var(--color-succes); }
+  .st-scheduled { color: var(--color-danger); }
+  .st-draft { color: color-mix(in srgb, var(--fg) 70%, transparent); }
   .muted { opacity: 0.65; }
 </style>
 
@@ -293,6 +362,9 @@ import Layout from '../layouts/Layout.astro';
     'character.unban': 'Desban de personaje',
     'character.gm.grant': 'GM otorgado',
     'character.gm.revoke': 'GM quitado',
+    'news.create': 'Noticia creada',
+    'news.update': 'Noticia editada',
+    'news.delete': 'Noticia borrada',
   };
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
@@ -339,6 +411,7 @@ import Layout from '../layouts/Layout.astro';
     online: () => loadOnline(),
     audit: () => loadAudit(),
     updates: () => loadUpdates(),
+    news: () => loadNews(),
   };
 
   document.querySelectorAll<HTMLButtonElement>('.tab').forEach((tab) => {
@@ -519,13 +592,15 @@ import Layout from '../layouts/Layout.astro';
   let pendingAction: ((reason: string) => Promise<void>) | null = null;
   let reasonRequired = false;
 
-  function askConfirm(opts: { title: string; message: string; reasonRequired: boolean; confirmLabel: string; danger?: boolean }, run: (reason: string) => Promise<void>) {
+  function askConfirm(opts: { title: string; message: string; reasonRequired: boolean; confirmLabel: string; danger?: boolean; hideReason?: boolean }, run: (reason: string) => Promise<void>) {
     if (!dialog) return;
     $('dialogTitle')!.textContent = opts.title;
     $('dialogMessage')!.textContent = opts.message;
     $('dialogReasonLabel')!.textContent = opts.reasonRequired ? 'Motivo (obligatorio)' : 'Motivo (opcional)';
     const reason = $('dialogReason') as HTMLTextAreaElement;
     reason.value = '';
+    reason.hidden = !!opts.hideReason;
+    $('dialogReasonLabel')!.hidden = !!opts.hideReason;
     $('dialogError')!.textContent = '';
     const confirm = $('dialogConfirm') as HTMLButtonElement;
     confirm.textContent = opts.confirmLabel;
@@ -768,6 +843,154 @@ import Layout from '../layouts/Layout.astro';
   }
 
   $('refreshUpdates')?.addEventListener('click', loadUpdates);
+
+  // ------------------------------------------------------------------ news
+  type AdminNews = {
+    id: number; title: string; summary: string | null; content: string; category: string;
+    imageUrl: string | null; published: boolean; pinned: boolean; publishedAt: string | null;
+    visible: boolean; createdAt: string; createdBy: string; updatedAt: string; updatedBy: string | null;
+  };
+  const NEWS_CATEGORY_LABEL: Record<string, string> = { novedad: 'Novedad', evento: 'Evento', mantenimiento: 'Mantenimiento' };
+  const newsForm = $('newsForm') as HTMLFormElement | null;
+  let newsItems: AdminNews[] = [];
+  let editingNewsId: number | null = null;
+
+  function newsState(n: AdminNews) {
+    if (!n.published) return '<span class="badge-status st-draft">Borrador</span>';
+    if (!n.visible) return '<span class="badge-status st-scheduled">Programada</span>';
+    return '<span class="badge-status st-published">Publicada</span>';
+  }
+
+  /** ISO -> valor de <input type="datetime-local"> en hora local. */
+  function toLocalInput(iso: string | null) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  async function loadNews() {
+    const list = $('newsList');
+    if (!list) return;
+    list.innerHTML = '<p class="result-empty">Cargando...</p>';
+    try {
+      newsItems = await api<AdminNews[]>('news');
+      list.innerHTML = newsItems.length ? `
+        <div class="table-scroll">
+          <table class="adm-table">
+            <thead><tr><th>Título</th><th>Categoría</th><th>Estado</th><th>Fecha</th><th>Autor</th><th></th></tr></thead>
+            <tbody>
+              ${newsItems.map((n) => `
+                <tr data-news-id="${n.id}">
+                  <td class="wrap">${n.pinned ? '📌 ' : ''}<strong>${esc(n.title)}</strong></td>
+                  <td>${esc(NEWS_CATEGORY_LABEL[n.category] ?? n.category)}</td>
+                  <td>${newsState(n)}</td>
+                  <td>${esc(fmtDate(n.publishedAt))}</td>
+                  <td>${esc(n.updatedBy ?? n.createdBy)}</td>
+                  <td>
+                    <div class="row-actions">
+                      ${n.visible ? `<a class="btn btn-ghost" href="/news/${n.id}" target="_blank" rel="noopener">Ver</a>` : ''}
+                      <button type="button" class="btn btn-ghost" data-news-act="edit">Editar</button>
+                      <button type="button" class="btn btn-danger" data-news-act="delete">Borrar</button>
+                    </div>
+                  </td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>` : '<p class="result-empty">Todavía no hay noticias. Creá la primera con "+ Nueva noticia".</p>';
+    } catch (error) {
+      list.innerHTML = '';
+      setFlash(error instanceof Error ? error.message : 'Error', 'error');
+    }
+  }
+
+  function openNewsForm(news: AdminNews | null) {
+    if (!newsForm) return;
+    editingNewsId = news?.id ?? null;
+    $('newsFormTitle')!.textContent = news ? `Editar noticia #${news.id}` : 'Nueva noticia';
+    const f = newsForm.elements as unknown as Record<string, HTMLInputElement>;
+    f.title.value = news?.title ?? '';
+    (f.category as unknown as HTMLSelectElement).value = news?.category ?? 'novedad';
+    f.publishedAt.value = toLocalInput(news?.publishedAt ?? null);
+    (f.summary as unknown as HTMLTextAreaElement).value = news?.summary ?? '';
+    (f.content as unknown as HTMLTextAreaElement).value = news?.content ?? '';
+    f.imageUrl.value = news?.imageUrl ?? '';
+    f.published.checked = news?.published ?? true;
+    f.pinned.checked = news?.pinned ?? false;
+    $('newsFormError')!.textContent = '';
+    newsForm.hidden = false;
+    f.title.focus();
+    newsForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function closeNewsForm() {
+    if (newsForm) newsForm.hidden = true;
+    editingNewsId = null;
+  }
+
+  $('newNews')?.addEventListener('click', () => openNewsForm(null));
+  $('newsCancel')?.addEventListener('click', closeNewsForm);
+  $('refreshNews')?.addEventListener('click', loadNews);
+
+  newsForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const f = newsForm.elements as unknown as Record<string, HTMLInputElement>;
+    const errorBox = $('newsFormError')!;
+    const title = f.title.value.trim();
+    const content = (f.content as unknown as HTMLTextAreaElement).value.trim();
+    if (title.length < 3) { errorBox.textContent = 'El título debe tener al menos 3 caracteres.'; return; }
+    if (!content) { errorBox.textContent = 'Escribí el contenido de la noticia.'; return; }
+
+    const body = {
+      title,
+      category: (f.category as unknown as HTMLSelectElement).value,
+      summary: (f.summary as unknown as HTMLTextAreaElement).value.trim(),
+      content,
+      imageUrl: f.imageUrl.value.trim() || null,
+      published: f.published.checked,
+      pinned: f.pinned.checked,
+      // datetime-local está en hora local: se envía como ISO (UTC)
+      publishedAt: f.publishedAt.value ? new Date(f.publishedAt.value).toISOString() : null,
+    };
+
+    const save = $('newsSave') as HTMLButtonElement;
+    save.disabled = true;
+    errorBox.textContent = '';
+    try {
+      const saved = editingNewsId
+        ? await api<AdminNews>(`news/${editingNewsId}`, { method: 'PUT', body })
+        : await api<AdminNews>('news', { method: 'POST', body });
+      closeNewsForm();
+      setFlash(`Noticia "${saved.title}" guardada${saved.visible ? ' y visible en la web y el launcher' : ''}.`, 'success');
+      await loadNews();
+    } catch (error) {
+      errorBox.textContent = error instanceof Error ? error.message : 'No se pudo guardar';
+    } finally {
+      save.disabled = false;
+    }
+  });
+
+  $('newsList')?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-news-act]');
+    if (!button) return;
+    const id = Number(button.closest<HTMLElement>('[data-news-id]')?.dataset.newsId);
+    const news = newsItems.find((n) => n.id === id);
+    if (!news) return;
+
+    if (button.dataset.newsAct === 'edit') {
+      openNewsForm(news);
+    } else if (button.dataset.newsAct === 'delete') {
+      askConfirm(
+        { title: 'Borrar noticia', message: `Se borrará "${news.title}". Si solo querés ocultarla, editala y destildá "Publicada".`, reasonRequired: false, confirmLabel: 'Borrar', danger: true, hideReason: true },
+        async () => {
+          await api(`news/${id}`, { method: 'DELETE' });
+          if (editingNewsId === id) closeNewsForm();
+          setFlash('Noticia borrada.', 'success');
+          await loadNews();
+        },
+      );
+    }
+  });
 
   // ------------------------------------------------------------------ init
   getSession().then((session) => {

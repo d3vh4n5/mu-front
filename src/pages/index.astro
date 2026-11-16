@@ -3,6 +3,11 @@ import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
 import { config } from '../constants/config';
 import Text from '../components/ui/Text.astro';
+import NewsList from '../components/NewsList.astro';
+import { fetchNewsPage } from '../lib/server/news';
+
+// Últimas noticias: si la API no responde, la sección simplemente no se muestra
+const latestNews = (await fetchNewsPage(1, 3))?.items ?? [];
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
@@ -31,7 +36,15 @@ import Text from '../components/ui/Text.astro';
 					El servidor aun se encuentra en desarrollo. Mantente atento a las novedades de la apertura oficial.
 				</Text>
 			</marquee>
-			
+
+			{latestNews.length > 0 && (
+				<>
+					<h3>Últimas noticias</h3>
+					<NewsList items={latestNews} showImages={false} />
+					<p class="news-more"><a href="/news">Ver todas las noticias →</a></p>
+				</>
+			)}
+
 			<h3>Información del servidor</h3>
 			<Text>
 				<ul class="server-info">
@@ -78,6 +91,7 @@ import Text from '../components/ui/Text.astro';
 	h1{
 		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 	}
+	.news-more { margin: 0 0 10px; text-align: right; font-size: 13px; }
 
 	marquee :global(.gradient-text-hot) {
 		display: inline-block;
