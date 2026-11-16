@@ -343,7 +343,7 @@ import Layout from '../layouts/Layout.astro';
     launcher: PublishedFile;
     updater: PublishedFile;
     manifest: {
-      source: 'disk' | 'embedded'; path: string; modifiedAt: string | null; error: string | null;
+      source: 'disk' | 'missing'; path: string; modifiedAt: string | null; error: string | null;
       version: string | null; fileCount: number; totalSize: number; missingCount: number; sizeMismatchCount: number;
       problems: { path: string; problem: 'missing' | 'size'; expected: number; actual: number | null }[];
     };
@@ -775,7 +775,7 @@ import Layout from '../layouts/Layout.astro';
   function renderManifest(m: UpdatesStatus['manifest']) {
     const sourceLabel = m.source === 'disk'
       ? `Archivo en disco (<code>${esc(m.path)}</code>)`
-      : 'Embebido en la API (no hay manifest.json en disco)';
+      : 'No hay manifest.json publicado (publicalo con Client Tools)';
     const problemsCount = m.missingCount + m.sizeMismatchCount;
     const health = m.error
       ? `<p class="notice bad">${esc(m.error)}. El launcher no va a poder verificar archivos.</p>`
