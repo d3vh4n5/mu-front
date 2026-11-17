@@ -4,7 +4,36 @@ import Layout from '../layouts/Layout.astro';
 import infoImg from '../assets/img/top-decorator.gif'
 import { Image } from 'astro:assets';
 
-const clientUrl = 'https://drive.google.com/file/d/1_X_XNBpP-w-5dUe3yh1TLNZICZJFLFI6/view?usp=sharing';
+const requirements = [
+	{ label: 'Sistema operativo', min: 'Windows 10 (64 bits)', rec: 'Windows 10 / 11 (64 bits)' },
+	{ label: 'Procesador', min: 'Dual Core 2.0 GHz', rec: 'Quad Core 2.5 GHz o superior' },
+	{ label: 'Memoria RAM', min: '2 GB', rec: '4 GB o más' },
+	{ label: 'Placa de video', min: '512 MB, compatible con OpenGL', rec: '1 GB o más' },
+	{ label: 'Espacio en disco', min: '1 GB libre', rec: '2 GB libres' },
+	{ label: 'Internet', min: 'Banda ancha', rec: 'Banda ancha estable' },
+];
+
+// Tres espejos del mismo cliente.
+const mirrors = [
+	{
+		name: 'MEGA',
+		url: 'https://mega.nz/file/yCQyiT7Y#WxqYdWAoqmdr3V9_kvbqAQM7qncp5pI3Zj6_53sU78w',
+		color: '#d9272e',
+		icon: '<circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 16.5V8l5 5 5-5v8.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+	},
+	{
+		name: 'MediaFire',
+		url: 'https://www.mediafire.com/file/iterzw41uagne34/Client.zip/file',
+		color: '#1299f3',
+		icon: '<path d="M2 7h7M1 12h6M2 17h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16.5 5C12 5 10.5 9 8.5 12c2 3 3.5 7 8 7a7 7 0 0 0 0-14Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" fill="currentColor"/>',
+	},
+	{
+		name: 'Google Drive',
+		url: 'https://drive.google.com/file/d/1LYLC2lXApDpc5bUKS3dGfro4rMWN2rMH/view?usp=sharing',
+		color: '#1fa463',
+		icon: '<path d="M8.2 2.5h7.6l7.2 12.4h-7.6z" fill="#ffc107"/><path d="M8.2 2.5 1 14.9l3.8 6.6L12 9.1z" fill="#1fa463"/><path d="M4.8 21.5h14.4l3.8-6.6H8.6z" fill="#4285f4"/>',
+	},
+];
 
 // Captura del launcher. Guardala en public/img/launcher.png y cambiá esto a '/img/launcher.png'.
 const launcherImg: string | null = null;
@@ -23,19 +52,61 @@ const launcherImg: string | null = null;
 				<div class="download-intro">
 					<h2>Cliente oficial de MU</h2>
 					<p>Descarga el cliente necesario para conectarte al servidor y comenzar a jugar.</p>
-					<a class="btn btn-success download-button" href={clientUrl} target="_blank" rel="noopener noreferrer">
-						Descargar cliente
-					</a>
+					<p class="mirrors-hint">Elige cualquiera de las 3 opciones: es el mismo cliente.</p>
+					<div class="mirrors">
+						{mirrors.map((m) => (
+							<a
+								class="mirror"
+								href={m.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								style={`--brand: ${m.color}`}
+								aria-label={`Descargar cliente desde ${m.name}`}
+							>
+								<svg class="mirror-icon" viewBox="0 0 24 24" aria-hidden="true" set:html={m.icon} />
+								<span class="mirror-text">
+									<small>Descargar desde</small>
+									<strong>{m.name}</strong>
+								</span>
+							</a>
+						))}
+					</div>
 				</div>
 
 				<div class="download-details">
+					<h3>Requisitos del sistema</h3>
+					<div class="reqs-wrap">
+						<table class="reqs">
+							<thead>
+								<tr>
+									<th scope="col"></th>
+									<th scope="col">Mínimos</th>
+									<th scope="col">Recomendados</th>
+								</tr>
+							</thead>
+							<tbody>
+								{requirements.map((r) => (
+									<tr>
+										<th scope="row">{r.label}</th>
+										<td>{r.min}</td>
+										<td>{r.rec}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+					<p class="reqs-note">
+						La descarga pesa unos <strong>305 MB</strong> (comprimida). Necesitas conexión a internet
+						para actualizar el cliente y para jugar.
+					</p>
+
 					<h3>Cómo empezar a jugar</h3>
 					<ol class="steps">
 						<li>
 							<strong>Crea tu cuenta</strong> desde <a href="/register">Crear cuenta</a>.
 						</li>
 						<li>
-							<strong>Descarga el cliente</strong> con el botón de arriba (Google Drive).
+							<strong>Descarga el cliente</strong> desde cualquiera de los botones de arriba (MEGA, MediaFire o Google Drive).
 						</li>
 						<li>
 							<strong>Descomprime el archivo</strong> en una carpeta propia, por ejemplo
@@ -135,13 +206,95 @@ const launcherImg: string | null = null;
 		margin-top: 0;
 	}
 
-	.download-button {
-		margin-top: 10px;
-		font-size: 14px;
+	.mirrors-hint {
+		margin: 4px 0 14px;
+		font-size: 0.9em;
+		opacity: 0.85;
+	}
+
+	.mirrors {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 12px;
+	}
+
+	.mirror {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 14px;
+		border: 1px solid color-mix(in srgb, var(--brand) 60%, transparent);
+		border-radius: 6px;
+		background: color-mix(in srgb, var(--brand) 12%, transparent);
+		color: var(--fg);
+		text-align: left;
+		text-decoration: none;
+		transition: background 0.15s, transform 0.15s, border-color 0.15s;
+	}
+
+	.mirror:hover,
+	.mirror:focus-visible {
+		background: color-mix(in srgb, var(--brand) 25%, transparent);
+		border-color: var(--brand);
+		transform: translateY(-2px);
+	}
+
+	.mirror-icon {
+		flex: none;
+		width: 32px;
+		height: 32px;
+		color: var(--brand);
+	}
+
+	.mirror-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.2;
+	}
+
+	.mirror-text small {
+		font-size: 0.75em;
+		opacity: 0.8;
 	}
 
 	.download-details {
 		margin-top: 24px;
+	}
+
+	.reqs-wrap {
+		overflow-x: auto;
+	}
+
+	.reqs {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.95em;
+	}
+
+	.reqs th,
+	.reqs td {
+		padding: 8px 10px;
+		border-bottom: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
+		text-align: left;
+		vertical-align: top;
+	}
+
+	.reqs thead th {
+		border-bottom-color: color-mix(in srgb, var(--fg) 45%, transparent);
+		text-transform: uppercase;
+		font-size: 0.8em;
+		letter-spacing: 1px;
+	}
+
+	.reqs tbody th {
+		white-space: nowrap;
+		font-weight: bold;
+	}
+
+	.reqs-note {
+		margin-top: 10px;
+		font-size: 0.9em;
+		opacity: 0.85;
 	}
 
 	.download-details h3 {
