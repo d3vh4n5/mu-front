@@ -19,17 +19,12 @@ import TermsContent from '../components/TermsContent.astro';
 				<h1>Crear cuenta</h1>
 				<p>Prepara tu personaje y sé parte de la aventura desde el comienzo.</p>
 			</div>
-			<section class="register-layout">
-				<div class="register-benefits">
-					<h2>Tu aventura empieza aquí</h2>
-					<p>Regístrate para acceder al servidor, descargar el cliente y comenzar a construir tu propia historia en MU Campana.</p>
-					<ul>
-						<li>Accede a una experiencia clásica de MU Online.</li>
-						<li>Compite en eventos y escala en el ranking.</li>
-						<li>Recibe tu contraseña de forma segura por correo.</li>
-					</ul>
-				</div>
-				<div class="register-form-wrapper">
+			<ol class="register-steps" aria-label="Cómo empezar a jugar">
+				<li><span class="step-num">1</span><span><strong>Crea tu cuenta</strong>Completa el formulario.</span></li>
+				<li><span class="step-num">2</span><span><strong>Revisa tu correo</strong>Allí llega tu contraseña.</span></li>
+				<li><span class="step-num">3</span><span><strong>Descarga y juega</strong>Instala el cliente y entra.</span></li>
+			</ol>
+			<section class="register-card">
 				<div id="message" role="status" aria-live="polite"></div>
 				<form id="registerForm">
 					<div class="input-group">
@@ -40,22 +35,19 @@ import TermsContent from '../components/TermsContent.astro';
 					<div class="input-group">
 						<label for="name">Nombre real</label>
 						<input type="text" id="name" maxlength="10" autocomplete="name" placeholder="Máximo 10 caracteres" required>
-						<small>Debe tener como máximo 10 caracteres.</small>
 					</div>
 					<div class="input-group">
 						<label for="email">Correo electrónico</label>
 						<input type="email" id="email" autocomplete="email" placeholder="tu-correo@ejemplo.com" required>
-						<small>Lo necesitarás para recibir tu contraseña y recuperar la cuenta.</small>
+						<small>Verifica que sea correcto: allí recibirás tu contraseña y podrás recuperar la cuenta.</small>
 					</div>
 					<div class="terms-choice">
 						<input type="radio" id="acceptTerms" name="terms" value="accepted" required>
 						<label for="acceptTerms">Acepto los <button type="button" class="terms-link" id="openTerms">términos y condiciones</button>.</label>
 					</div>
-					<p class="terms-help">Verifica que tu correo sea correcto: allí recibirás la contraseña de tu cuenta.</p>
 					<button type="submit" class="btn btn-success primary">Crear mi cuenta</button>
 					<p class="form-link"><a href="/forgot-password">¿Olvidaste tu contraseña?</a></p>
 				</form>
-				</div>
 			</section>
 			<dialog id="termsDialog" aria-labelledby="termsTitle">
 				<div class="dialog-header">
@@ -99,39 +91,53 @@ import TermsContent from '../components/TermsContent.astro';
 		font-size: 14px;
 	}
 
-	.register-layout {
+	.register-steps {
 		display: grid;
-		grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-		gap: 24px;
-		align-items: start;
-		margin-top: 24px;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 10px;
+		max-width: 460px;
+		margin: 20px auto 0;
+		padding: 0;
+		list-style: none;
 	}
 
-	.register-benefits,
-	.register-form-wrapper {
-		padding: 20px;
-		border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
-		border-radius: 5px;
-		background-color: var(--bg-transparent);
+	.register-steps li {
+		display: flex;
+		gap: 8px;
+		align-items: flex-start;
+		font-size: 11px;
+		line-height: 1.4;
+		opacity: 0.9;
 	}
 
-	.register-benefits h2 {
-		margin-top: 0;
+	.register-steps strong {
+		display: block;
+		margin-bottom: 2px;
+		font-size: 12px;
 		color: var(--color-danger);
 	}
 
-	.register-benefits p,
-	.register-benefits li,
-	.terms-help {
-		line-height: 1.6;
+	.step-num {
+		display: grid;
+		place-items: center;
+		flex: 0 0 24px;
+		height: 24px;
+		border: 1px solid var(--color-danger);
+		border-radius: 50%;
+		color: var(--color-danger);
+		font-size: 12px;
+		font-weight: 700;
 	}
 
-	.register-benefits ul {
-		padding-left: 20px;
-	}
-
-	.register-benefits li {
-		margin-bottom: 10px;
+	.register-card {
+		max-width: 460px;
+		margin: 20px auto 0;
+		padding: 24px;
+		box-sizing: border-box;
+		border: 1px solid color-mix(in srgb, var(--color-danger) 45%, transparent);
+		border-radius: 6px;
+		background-color: var(--bg-transparent);
+		box-shadow: 0 0 18px rgba(0, 0, 0, 0.45);
 	}
 
 	.input-group {
@@ -170,22 +176,21 @@ import TermsContent from '../components/TermsContent.astro';
 		color: color-mix(in srgb, var(--fg) 65%, transparent);
 	}
 
+	#message:empty {
+		display: none;
+	}
+
 	#message {
 		margin-bottom: 15px;
 		text-align: center;
 		font-size: 14px;
 	}
 
-	.terms-help {
-		font-size: 11px;
-		opacity: 0.85;
-	}
-
 	.terms-choice {
 		display: flex;
 		gap: 8px;
 		align-items: flex-start;
-		margin: 18px 0 4px;
+		margin: 18px 0 16px;
 		padding: 10px 12px;
 		border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
 		border-radius: 4px;
@@ -316,9 +321,13 @@ import TermsContent from '../components/TermsContent.astro';
 		color: var(--fg);
 	}
 
-	@media (max-width: 620px) {
-		.register-layout {
+	@media (max-width: 480px) {
+		.register-steps {
 			grid-template-columns: 1fr;
+		}
+
+		.register-card {
+			padding: 18px 16px;
 		}
 	}
 </style>
