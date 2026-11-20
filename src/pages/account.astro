@@ -262,6 +262,7 @@ const commands = [
 
 <script>
   import { getSession } from '../lib/client/session';
+  import { config } from '../constants/config';
 
   type Stats = { strength: number; dexterity: number; vitality: number; energy: number; leadership: number };
   type Character = {
@@ -557,7 +558,7 @@ const commands = [
     const body = encodeURIComponent(
       `Usuario: ${account?.username ?? ''}\nCorreo: ${account?.email ?? ''}\nNivel de cuenta: ${account?.accountLevel ?? 0}\n\n${data.get('message')}`,
     );
-    window.location.href = `mailto:soporte@mu-campana.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${config.contact.email}?subject=${subject}&body=${body}`;
   });
 
   getSession().then((session) => {
