@@ -1,0 +1,141 @@
+---
+/**
+ * Bienvenida de la portada: logo, título (h1), bajada y botones principales.
+ *  - overHero: sobre el banner. Logo y título van en el hueco del arco (donde estaba
+ *    el cartel de la imagen original); bajada y botones, abajo.
+ *  - sin overHero: todo junto al inicio del contenedor (modo "compacto").
+ */
+import { Image } from 'astro:assets';
+import PageHeading from './PageHeading.astro';
+import logoImg from '../assets/img/logo-campana.png';
+import { config } from '../constants/config';
+
+interface Props {
+  overHero?: boolean;
+}
+
+const { overHero = false } = Astro.props;
+const title = `Bienvenidos a ${config.project.alias}`;
+const eyebrow = `MU Online ${config.server.version}`;
+const lead = 'Experiencia equilibrada para jugar con amigos, competir en eventos y escalar en el ranking.';
+---
+
+{overHero ? (
+  <>
+    <div class="intro-arch">
+      <Image src={logoImg} alt={`Logo de ${config.project.alias}`} class="home-logo" width={150} height={150} loading="eager" />
+      <PageHeading large eyebrow={eyebrow} title={title} />
+    </div>
+    <div class="intro-bottom">
+      <p class="intro-lead">{lead}</p>
+      <div class="cta">
+        <a href="/downloads" class="btn btn-success">Descargar cliente</a>
+        <a href="/register" class="btn">Crear cuenta</a>
+      </div>
+    </div>
+  </>
+) : (
+  <div class="home-intro">
+    <Image src={logoImg} alt={`Logo de ${config.project.alias}`} class="home-logo" width={150} height={150} loading="eager" />
+    <PageHeading large eyebrow={eyebrow} title={title} lead={lead}>
+      <div class="cta">
+        <a href="/downloads" class="btn btn-success">Descargar cliente</a>
+        <a href="/register" class="btn">Crear cuenta</a>
+      </div>
+    </PageHeading>
+  </div>
+)}
+
+<style>
+  .home-intro {
+    width: 100%;
+    text-align: center;
+  }
+
+  .home-logo {
+    display: block;
+    width: 130px;
+    height: auto;
+    margin: -8px auto -14px;
+    filter: drop-shadow(0 0 18px rgba(140, 90, 255, 0.55)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.7));
+  }
+
+  /* ---- Sobre el banner ---- */
+
+  /*
+   * Centro del hueco del arco: en la imagen (1024x572) está en y≈250.
+   * Con object-fit: cover y anclada arriba, la escala es max(100vw/1024, alto/572),
+   * así que el centro cae en max(24.4vw, 43.7% del alto); el banner mide al menos 600px.
+   */
+  .intro-arch {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: max(24.4vw, 43.7vh, 262px);
+    translate: 0 -50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px;
+    text-align: center;
+  }
+
+  .intro-arch .home-logo {
+    width: clamp(78px, 13vh, 140px);
+    margin: 0 auto -10px;
+  }
+
+  .intro-arch :global(.page-heading) {
+    margin: 0;
+    padding: 6px 0 0;
+  }
+
+  .intro-arch :global(.ph-title) {
+    font-size: clamp(28px, 3.3vw, 44px);
+  }
+
+  .intro-arch :global(.ph-ornament) {
+    margin-top: 8px;
+  }
+
+  .intro-bottom {
+    max-width: 640px;
+    text-align: center;
+  }
+
+  .intro-lead {
+    margin: 0;
+    font-size: 15px;
+    color: #f3e8d2;
+    text-shadow: 0 1px 3px #000, 0 0 12px rgba(0, 0, 0, 0.8);
+  }
+
+  .intro-bottom .cta {
+    justify-content: center;
+    margin-top: 14px;
+  }
+
+  /* Celular: la imagen va completa arriba y la bienvenida debajo, en orden */
+  @media (max-width: 760px) {
+    .intro-arch {
+      position: static;
+      translate: none;
+      padding: 0;
+    }
+
+    .intro-bottom {
+      margin-top: 12px;
+    }
+
+    .intro-bottom .cta :global(.btn) {
+      flex: 1 1 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .home-logo,
+    .intro-arch .home-logo {
+      width: 116px;
+    }
+  }
+</style>

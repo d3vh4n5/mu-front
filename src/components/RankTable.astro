@@ -3,8 +3,8 @@
 // va debajo del nombre; con más ancho (celular, tablet) pasa a su propia columna.
 ---
 
-<div class="mu-box rank-box">
-  <h3>TOP 10 GUERREROS</h3>
+<div class="rank-box">
+  <h3>Top 10 Guerreros</h3>
   <div class="rank-list">
     <div class="rank-row rank-head" aria-hidden="true">
       <span>#</span>
@@ -22,21 +22,24 @@
 <style>
   .rank-box {
     width: 100%;
-    margin: 20px auto;
-    border: 2px solid var(--color-danger);
-    background: #0e0e0e;
-    color: #f5deb3;
-    box-shadow: 0 0 10px #000;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(207, 178, 121, 0.3);
+    border-radius: 10px;
+    background: rgba(14, 6, 4, 0.6);
+    color: #f3e8d2;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
   }
 
   .rank-box h3 {
     margin: 0;
-    padding: 10px;
+    padding: 12px 10px;
+    font-size: 16px;
     text-align: center;
-    background: linear-gradient(#4b0000, #220000);
+    background: linear-gradient(180deg, rgba(120, 30, 10, 0.65), rgba(70, 19, 3, 0.65));
     color: var(--color-danger);
-    border-bottom: 2px solid var(--color-danger);
-    text-shadow: 1px 1px 2px #000;
+    border-bottom: 1px solid rgba(207, 178, 121, 0.35);
+    text-shadow: 0 1px 2px #000;
   }
 
   @media (max-width: 480px) {
@@ -59,21 +62,23 @@
     gap: 8px;
     align-items: center;
     padding: 7px 10px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid rgba(207, 178, 121, 0.1);
     font-size: 12px;
   }
 
   .rank-head {
-    background: #1c1c1c;
     color: var(--color-danger);
+    font-size: 11px !important;
     font-weight: 700;
-    border-bottom-color: var(--color-danger) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom-color: rgba(207, 178, 121, 0.35) !important;
   }
 
-  .rank-list :global(.rank-row:nth-child(odd)) { background-color: #121212; }
-  .rank-list :global(.rank-row:nth-child(even)) { background-color: #0a0a0a; }
-  .rank-head.rank-row { background-color: #1c1c1c; }
-  .rank-body :global(.rank-row:hover) { background-color: #2a1a00; }
+  .rank-list :global(.rank-row:nth-child(even)) { background-color: rgba(207, 178, 121, 0.04); }
+  .rank-head.rank-row { background-color: rgba(120, 30, 10, 0.3); }
+  .rank-body :global(.rank-row:hover) { background-color: rgba(120, 30, 10, 0.2); }
+  .rank-body :global(.rank-row:last-child) { border-bottom: 0; }
 
   .rank-list :global(.num) {
     min-width: 34px;

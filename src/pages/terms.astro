@@ -2,23 +2,15 @@
 import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
 import TermsContent from '../components/TermsContent.astro';
-import infoImg from '../assets/img/top-decorator.gif';
-import { Image } from 'astro:assets';
 ---
 
-<Layout>
+<Layout heading={{ eyebrow: "Información del servidor", title: "Términos y condiciones", lead: "Lee las condiciones de uso de MU Campana antes de crear tu cuenta." }} title="Términos y condiciones" description="Términos y condiciones de uso de Mu Campana: conducta, cliente, cuentas, sanciones y tratamiento de datos.">
 	<Main>
 		<div class="container">
-			<Image src={infoImg} alt="" class:list="noticias" />
-			<div class="page-heading">
-				<p class="eyebrow">Información del servidor</p>
-				<h1>Términos y condiciones</h1>
-				<p>Lee las condiciones de uso de MU Campana antes de crear tu cuenta.</p>
-			</div>
 			<section class="terms-page">
 				<TermsContent />
 				<div class="terms-actions">
-					<a class="btn btn-success" href="/register">Crear cuenta</a>
+					<a class="btn" href="/register">Crear cuenta</a>
 					<a class="btn" href="/">Volver al inicio</a>
 				</div>
 			</section>
@@ -29,32 +21,6 @@ import { Image } from 'astro:assets';
 <style>
 	.container {
 		width: 100%;
-	}
-
-	.noticias {
-		width: 100%;
-	}
-
-	.page-heading {
-		text-align: center;
-	}
-
-	.eyebrow {
-		margin: 18px 0 0;
-		color: var(--color-danger);
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-	}
-
-	h1 {
-		margin-bottom: 8px;
-		text-transform: uppercase;
-		letter-spacing: 2px;
-	}
-
-	.page-heading > p:last-child {
-		font-size: 14px;
 	}
 
 	.terms-page {

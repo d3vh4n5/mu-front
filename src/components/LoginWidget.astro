@@ -1,4 +1,4 @@
-<section class="login-widget" aria-labelledby="login-title">
+<section class="login-widget" id="login" aria-labelledby="login-title">
   <div id="loggedOut">
     <h2 id="login-title">Ingresar</h2>
     <form id="loginWidgetForm">
@@ -23,12 +23,16 @@
 
 <style>
   .login-widget {
+    scroll-margin-top: 64px;
     width: 100%;
     box-sizing: border-box;
-    padding: 14px;
-    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
-    border-radius: 5px;
-    background: var(--bg-transparent);
+    padding: 18px 16px;
+    border: 1px solid rgba(207, 178, 121, 0.28);
+    border-radius: 10px;
+    background:
+        radial-gradient(ellipse at top, rgba(120, 30, 10, 0.25), transparent 65%),
+        rgba(14, 6, 4, 0.55);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
   }
 
   h2 {
@@ -40,23 +44,14 @@
   }
 
   label {
-    display: block;
-    margin: 8px 0 4px;
+    margin: 10px 0 5px;
     font-size: 11px;
   }
 
   input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 7px;
-    border: 1px solid var(--fg);
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.2);
-    color: var(--fg);
-    font: inherit;
+    padding: 8px 10px;
+    font-size: 13px;
   }
-
-  input:focus { outline: 1px solid var(--color-primary); }
 
   .primary {
     width: 100%;

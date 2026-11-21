@@ -2,8 +2,6 @@
 import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
 import { config } from '../constants/config';
-import { Image } from 'astro:assets';
-import infoImg from '../assets/img/top-decorator.gif'
 
 const tiers = ["FREE", "VIP 1", "VIP 2", "VIP 3"];
 const rows = [
@@ -19,28 +17,18 @@ const rows = [
 ];
 ---
 
-<Layout>
+<Layout heading={{ eyebrow: "Apoya el proyecto", title: `Socio VIP de ${config.project.alias}`, lead: "Tu aporte ayuda a mantener el servidor activo y la comunidad en crecimiento." }} title="Socio VIP" description="Apoya a Mu Campana con el sistema VIP: compara los beneficios de cada nivel frente a la modalidad FREE. El servidor sigue siendo gratuito para todos.">
 	<Main>
 		<div class="container">
 
-			<Image
-				src={infoImg}
-				alt={"Imagen"}
-				class:list={"noticias"}
-			/>
 
-			<div class="vip-heading">
-				<p class="eyebrow">Apoyá el proyecto</p>
-				<h1>Socio VIP de {config.project.alias}</h1>
-				<p class="lead">Tu aporte ayuda a mantener el servidor activo y la comunidad en crecimiento.</p>
-			</div>
 
 			<section class="vip-intro">
 				<div class="intro-copy">
 					<h2>Una forma de sumar tu apoyo</h2>
 					<p>MU Campana sigue siendo gratuito para todos. El sistema VIP ofrece beneficios temporales a quienes eligen aportar al mantenimiento, sin convertir la experiencia en un servidor pay-to-win.</p>
-					<p>Elegí el nivel que mejor se adapte a vos y revisá la comparación completa antes de aportar. Cada beneficio está pensado para acompañar tu progreso sin quitarle valor al esfuerzo dentro del juego.</p>
-					<a class="btn btn-success" href="#beneficios">Ver beneficios VIP</a>
+					<p>Elige el nivel que mejor se adapte a ti y revisa la comparación completa antes de aportar. Cada beneficio está pensado para acompañar tu progreso sin quitarle valor al esfuerzo dentro del juego.</p>
+					<a class="btn" href="#beneficios">Ver beneficios VIP</a>
 				</div>
 				<div class="support-note">
 					<strong>Tu aporte se transforma en servidor</strong>
@@ -51,8 +39,8 @@ const rows = [
 			<section id="beneficios" class="benefits-section">
 				<div class="section-heading">
 					<p class="eyebrow">Comparación de beneficios</p>
-					<h2>Elegí tu nivel VIP</h2>
-					<p>Compará cada beneficio con la modalidad FREE y encontrá la opción que más te convenga.</p>
+					<h2>Elige tu nivel VIP</h2>
+					<p>Compara cada beneficio con la modalidad FREE y encuentra la opción que más te convenga.</p>
 				</div>
 				<div class="tier-list">
 					{tiers.map((tier, index) => (
@@ -62,8 +50,8 @@ const rows = [
 						</div>
 					))}
 				</div>
-				<div class="table-wrapper">
-				<table>
+				<div class="table-card vip-table-card">
+				<table class="data-table vip-table">
 					<thead>
 					<tr>
 						<th>Categoría</th>
@@ -99,14 +87,6 @@ const rows = [
 	</Main>
 </Layout>
 <style>
-	.noticias {
-		width: 100%;
-	}
-
-	.vip-heading {
-		text-align: center;
-	}
-
 	.eyebrow {
 		margin: 18px 0 8px;
 		color: var(--color-danger);
@@ -114,17 +94,6 @@ const rows = [
 		font-weight: 700;
 		letter-spacing: 1px;
 		text-transform: uppercase;
-	}
-
-	.vip-heading h1 {
-		margin: 0;
-		text-transform: uppercase;
-		letter-spacing: 2px;
-	}
-
-	.lead {
-		font-size: 15px;
-		line-height: 1.6;
 	}
 
 	.vip-intro {
@@ -187,9 +156,10 @@ const rows = [
 		padding: 10px;
 		flex-direction: column;
 		justify-content: center;
-		border: 1px solid var(--color-danger);
-		border-radius: 4px;
-		background: linear-gradient(145deg, rgba(89, 43, 173, 0.45), rgba(70, 19, 3, 0.45));
+		border: 1px solid rgba(207, 178, 121, 0.45);
+		border-radius: 8px;
+		background: linear-gradient(160deg, rgba(120, 30, 10, 0.55), rgba(60, 16, 4, 0.6));
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 		text-align: center;
 	}
 
@@ -212,45 +182,29 @@ const rows = [
 		color: var(--fg);
 	}
 
-	.table-wrapper {
-		overflow-x: auto;
-		border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
-		border-radius: 5px;
-		background: rgba(0, 0, 0, 0.2);
-	}
-
-	table {
-		width: 100%;
+	.vip-table {
 		min-width: 650px;
-		border-collapse: collapse;
-		font-size: 12px;
 	}
 
-	th,
-	td {
-		padding: 11px 10px;
-		border-bottom: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
+	.vip-table th,
+	.vip-table td {
 		text-align: center;
 	}
 
-	th {
-		background: linear-gradient(90deg, var(--color-primary), var(--color-brown));
-		color: var(--fg);
-		font-size: 11px;
-		text-transform: uppercase;
-	}
-
-	td:first-child,
-	td:nth-child(2) {
+	.vip-table th:nth-child(-n+2),
+	.vip-table td:nth-child(-n+2) {
 		text-align: left;
 	}
 
-	tbody tr:nth-child(even) {
-		background: rgba(0, 0, 0, 0.2);
+	.vip-table td:first-child {
+		color: var(--color-gold-soft);
+		font-size: 12px;
 	}
 
-	tbody tr:hover {
-		background: rgba(255, 165, 0, 0.12);
+	/* columnas VIP: valores en dorado */
+	.vip-table td:nth-child(n+4) {
+		color: var(--color-danger);
+		font-weight: 700;
 	}
 
 	.vip-conditions {
@@ -280,7 +234,7 @@ const rows = [
 			grid-template-columns: repeat(2, 1fr);
 		}
 
-		.table-wrapper {
+		.vip-table-card {
 			margin: 0 -4px;
 		}
 	}

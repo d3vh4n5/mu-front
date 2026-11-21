@@ -10,7 +10,14 @@ if (!news) Astro.response.status = 404;
 const html = news ? renderNewsMarkdown(news.content) : '';
 ---
 
-<Layout>
+<Layout
+  title={news ? news.title : 'Noticia no encontrada'}
+  description={news?.summary || undefined}
+  image={news?.imageUrl || undefined}
+  type={news ? 'article' : 'website'}
+  publishedAt={news?.publishedAt}
+  noindex={!news}
+>
   <Main>
     <article class="news-article">
       <a class="back" href="/news">← Todas las noticias</a>

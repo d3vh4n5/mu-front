@@ -1,0 +1,118 @@
+---
+/**
+ * Título principal de página: etiqueta superior, título con degradado
+ * violeta→dorado, ornamento y bajada opcional. El slot permite agregar
+ * contenido debajo (por ejemplo botones).
+ */
+interface Props {
+  title: string;
+  eyebrow?: string;
+  lead?: string;
+  /** Tamaño mayor para la portada */
+  large?: boolean;
+}
+
+const { title, eyebrow, lead, large = false } = Astro.props;
+// ids únicos: una página puede tener más de un encabezado (p. ej. uno oculto)
+const uid = Math.random().toString(36).slice(2, 8);
+---
+
+<header class:list={['page-heading', { large }]}>
+  {eyebrow && <p class="ph-eyebrow"><span aria-hidden="true">◆</span>{eyebrow}<span aria-hidden="true">◆</span></p>}
+  <h1 class="ph-title">{title}</h1>
+  <svg class="ph-ornament" viewBox="0 0 240 14" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id={`ph-l-${uid}`} x1="0" x2="1">
+        <stop offset="0" stop-color="#b48cff" stop-opacity="0" />
+        <stop offset="1" stop-color="#b48cff" />
+      </linearGradient>
+      <linearGradient id={`ph-r-${uid}`} x1="0" x2="1">
+        <stop offset="0" stop-color="#b48cff" />
+        <stop offset="1" stop-color="#b48cff" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+    <rect x="0" y="6.5" width="96" height="1" fill={`url(#ph-l-${uid})`} />
+    <rect x="144" y="6.5" width="96" height="1" fill={`url(#ph-r-${uid})`} />
+    <path d="M104 7 L108 3 L112 7 L108 11 Z" fill="#b48cff" opacity="0.8" />
+    <path d="M128 7 L132 3 L136 7 L132 11 Z" fill="#b48cff" opacity="0.8" />
+    <path d="M120 0 L127 7 L120 14 L113 7 Z" fill="#f0b03c" />
+    <path d="M120 4 L123 7 L120 10 L117 7 Z" fill="#070013" />
+  </svg>
+  {lead && <p class="ph-lead">{lead}</p>}
+  <slot />
+</header>
+
+<style>
+  .page-heading {
+    position: relative;
+    margin: 4px 0 32px;
+    padding: 18px 0 8px;
+    text-align: center;
+  }
+
+  /* brillo violeta detrás del título */
+  .page-heading::before {
+    content: '';
+    position: absolute;
+    inset: 0 8% auto;
+    height: 120px;
+    background: radial-gradient(ellipse at center, rgba(89, 43, 173, 0.35), transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .ph-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-danger);
+  }
+
+  .ph-eyebrow span {
+    font-size: 8px;
+    color: var(--color-primary-soft);
+  }
+
+  .ph-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(26px, 5vw, 34px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--color-primary-soft), #f3e8ff 45%, var(--color-danger));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 14px rgba(150, 100, 255, 0.35)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8));
+  }
+
+  .large .ph-title {
+    font-size: clamp(28px, 6vw, 42px);
+  }
+
+  .ph-ornament {
+    display: block;
+    width: min(240px, 70%);
+    height: 14px;
+    margin: 12px auto 0;
+  }
+
+  .ph-lead {
+    max-width: 52ch;
+    margin: 14px auto 0;
+    font-size: 15px;
+    opacity: 0.9;
+  }
+
+  .page-heading :global(.cta) {
+    justify-content: center;
+    margin-top: 18px;
+  }
+</style>

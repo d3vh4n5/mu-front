@@ -1,112 +1,41 @@
 ---
 interface Props {
-  title: string,
+  title?: string,
   columns: string[],
   data: (string | number)[][]
   id?: string
 }
 
 const { title, columns, data, id } = Astro.props
-
 ---
 
-<div class="mu-box">
-  {title && <h3>{title}</h3>}
-
-  <div class="mu-table-scroll">
-  <table class="mu-table">
+<div class="table-card mu-table-card">
+  {title && <h3 class="table-card-title">{title}</h3>}
+  <table class="data-table">
     <thead>
       <tr>
-        {columns.map(col => (
-          <th>{col}</th>
-        ))}
+        {columns.map(col => <th scope="col">{col}</th>)}
       </tr>
     </thead>
-
     <tbody id={id}>
       {data.map((row) => (
         <tr>
-          {row.map((col) => (
-            <td>
-              {col}
-            </td>
-          ))}
+          {row.map((col) => <td>{col}</td>)}
         </tr>
       ))}
     </tbody>
   </table>
-  </div>
 </div>
 
-<style is:global>
- .mu-box {
-    width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
-    border: 2px solid var(--color-danger);
-    background: #0e0e0e;
-    color: #f5deb3;
-    box-shadow: 0 0 10px #000;
+<style>
+  .mu-table-card {
+    margin: 20px 0;
   }
 
-  .mu-box h3 {
-    margin: 0;
-    padding: 10px;
-    text-align: center;
-    background: linear-gradient(#4b0000, #220000);
-    color: var(--color-danger);
-    border-bottom: 2px solid var(--color-danger);
-    text-shadow: 1px 1px 2px #000;
-  }
-
-  .mu-table-scroll {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .mu-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  @media (max-width: 480px) {
-    .mu-box {
-      margin: 14px 0;
-    }
-
-    .mu-table th,
-    .mu-table td {
-      padding: 6px;
-      font-size: 11px;
-    }
-
-    .mu-table td:first-child {
-      word-break: break-word;
-    }
-  }
-
-  .mu-table th {
-    background: #1c1c1c;
-    color: var(--color-danger);
-    padding: 8px;
-    border-bottom: 1px solid var(--color-danger);
-  }
-
-  .mu-table td {
-    padding: 8px;
-    border-bottom: 1px solid #333;
-  }
-
-  .mu-table tr:nth-child(odd) {
-    background: #121212;
-  }
-
-  .mu-table tr:nth-child(even) {
-    background: #0a0a0a;
-  }
-
-  .mu-table tr:hover {
-    background: #2a1a00;
+  /* primera columna (comando / skill) destacada */
+  .mu-table-card :global(td:first-child) {
+    color: var(--color-gold-soft);
+    font-weight: 700;
+    white-space: nowrap;
   }
 </style>

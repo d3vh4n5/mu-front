@@ -3,10 +3,16 @@ import EventBanners from "./EventBanners.astro";
 import RankTable from "./RankTable.astro";
 import OnlinePlayers from "./OnlinePlayers.astro";
 import LoginWidget from "./LoginWidget.astro";
+import PageHeading from "./PageHeading.astro";
+import { config } from "../constants/config";
+
+// Con el banner completo en páginas internas, el título va al inicio del contenedor
+const heading = config.pages.hero === 'completo' ? Astro.locals.pageHeading : undefined;
 ---
 
 <main id="container" class="bg-blur">
 	<section class="mid">
+		{heading && <PageHeading eyebrow={heading.eyebrow} title={heading.title} lead={heading.lead} />}
 		<slot></slot>
 	</section>
 	<section class="right">
@@ -22,10 +28,11 @@ import LoginWidget from "./LoginWidget.astro";
 <style>
 	main{
 		box-sizing: border-box;
-		padding: 20px 0;
+		padding: 32px 12px;
 		position: relative;
 		/* por encima de la lluvia de fuego (z-index 1) */
 		z-index: 2;
+		/* se monta sobre el borde inferior del banner: ahí se luce el vidrio con blur */
 		transform: translateY(-10vh);
 		margin: 0 auto;
 		width: 100%;
@@ -41,7 +48,7 @@ import LoginWidget from "./LoginWidget.astro";
 	.right{
 		box-sizing: border-box;
 		min-width: 0;
-		padding: 20px;
+		padding: 20px 24px;
 	}
 
 	.left{
@@ -62,40 +69,28 @@ import LoginWidget from "./LoginWidget.astro";
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 16px;
+		gap: 22px;
+	}
+
+	/* aire entre ítems de listas del contenido (especificidad 0: los componentes pueden pisarlo) */
+	.mid :global(:where(ul, ol) > li + li) {
+		margin-top: 6px;
 	}
 
 	.right-container > :global(*) {
 		max-width: 100%;
 	}
 
-	.right-container :global(.mu-box) {
-		margin: 0;
+	/* Portada: el banner a pantalla completa es la presentación; el contenido empieza
+	   justo debajo y, con el parallax, se desliza sobre la imagen al scrollear */
+	:global(body.hero-full) main {
+		transform: translateY(-48px);
 	}
 
-	.right-container :global(.mu-table th),
-	.right-container :global(.mu-table td) {
-		padding: 7px 5px;
-		text-align: left;
+	/* Páginas internas con franja: el vidrio se monta apenas sobre su borde inferior */
+	:global(body.hero-strip) main {
+		transform: translateY(-36px);
 	}
-
-	/* Columna "#" angosta; las numéricas a la derecha */
-	.right-container :global(.mu-table th:first-child),
-	.right-container :global(.mu-table td:first-child) {
-		width: 1.8em;
-		text-align: center;
-	}
-
-	.right-container :global(.mu-table th:nth-child(n+3)),
-	.right-container :global(.mu-table td:nth-child(n+3)) {
-		width: 3.5em;
-		text-align: right;
-	}
-
-	.right-container :global(.mu-table td:nth-child(2)) {
-		overflow-wrap: anywhere;
-	}
-
 
 	@media (max-width: 760px) {
 		main {
@@ -103,6 +98,16 @@ import LoginWidget from "./LoginWidget.astro";
 			padding: 8px 0;
 			border-radius: 10px;
 			transform: translateY(-6vh);
+		}
+
+		:global(body.hero-strip) main {
+			transform: translateY(-18px);
+		}
+
+		/* portada en celular: la presentación va debajo de la imagen, sin superposición */
+		:global(body.hero-full) main {
+			transform: none;
+			margin-top: 24px;
 		}
 
 		.mid,

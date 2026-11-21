@@ -2,62 +2,74 @@
 import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
 import { config } from '../constants/config';
-import Text from '../components/ui/Text.astro';
 import NewsList from '../components/NewsList.astro';
+import HomeIntro from '../components/HomeIntro.astro';
 import { fetchNewsPage } from '../lib/server/news';
+
+// Estilo de portada: "presentacion" (banner a pantalla completa) o "compacto"
+const heroOverBanner = config.home.hero === 'presentacion';
 
 // Últimas noticias: si la API no responde, la sección simplemente no se muestra
 const latestNews = (await fetchNewsPage(1, 3))?.items ?? [];
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
+	{heroOverBanner && <HomeIntro slot="hero" overHero />}
+
 	<Main>
 		<section>
+			{!heroOverBanner && <HomeIntro />}
 
-			<h1 class="gradient-text-cold">Bienvenidos a {config.project.alias}</h1>
-
-			<div class="welcomeMessage">
-				<p class="subtitle">
-					MU Online {config.server.version} • Experiencia equilibrada
-				</p>
-
-				<div class="cta">
-					<a href="/downloads" class="btn btn-success">Descargar cliente</a>
-					<a href="/register" class="btn">Crear cuenta</a>
-				</div>
-			</div>
-	
-			<h3>Noticias</h3>
-			<marquee>
-				<Text>
-					El servidor aun se encuentra en desarrollo. Mantente atento a las novedades de la apertura oficial.
-				</Text>
-			</marquee>
+			<h3 class:list={[{ 'first-section': heroOverBanner }]}>Noticias</h3>
+			<p class="notice">
+				<strong>Servidor en desarrollo.</strong> Mantente atento a las novedades de la apertura oficial.
+			</p>
 
 			{latestNews.length > 0 && (
 				<>
-					<h3>Últimas noticias</h3>
 					<NewsList items={latestNews} showImages={false} />
 					<p class="news-more"><a href="/news">Ver todas las noticias →</a></p>
 				</>
 			)}
 
 			<h3>Información del servidor</h3>
-			<Text>
-				<ul class="server-info">
-					<li><strong>Versión:</strong> 99b + DL</li>
-					<li><strong>Experiencia:</strong> x100</li>
-					<li><strong>Drop:</strong> 40%</li>
-					<li><strong>Reset:</strong> nivel 400 · 5kk zen · 400 puntos por reset (borra stats)</li>
-					<li><strong>Máx resets:</strong> 300</li>
-					<li><strong>Máx stats:</strong> 32767</li>
-					<li><strong>Eventos:</strong> BC, DS, CC, Invasiones</li>
-					<li><strong>Comandos:</strong> Restea y agrega puntos sin salir del juego</li>
-				</ul>
-			</Text>
+			<div class="server-sheet">
+				<div class="sheet-groups">
+					<section>
+						<h4>Rates</h4>
+						<dl>
+							<div><dt>Experiencia</dt><dd>x100</dd></div>
+							<div><dt>Drop</dt><dd>40%</dd></div>
+						</dl>
+					</section>
+					<section>
+						<h4>Personaje y juego</h4>
+						<dl>
+							<div><dt>Máx. stats</dt><dd>32767</dd></div>
+							<div><dt>Comandos</dt><dd><a href="/help">Ver lista</a></dd></div>
+						</dl>
+						<p class="sheet-note">Resetea y agrega puntos sin salir del juego.</p>
+					</section>
+					<section>
+						<h4>Reset</h4>
+						<dl>
+							<div><dt>Nivel</dt><dd>400</dd></div>
+							<div><dt>Costo</dt><dd>5kk zen</dd></div>
+							<div><dt>Puntos por reset</dt><dd>400</dd></div>
+							<div><dt>Máximo</dt><dd>300</dd></div>
+						</dl>
+						<p class="sheet-note">Borra stats al resetear.</p>
+					</section>
+				</div>
+				<div class="sheet-events">
+					<span class="sheet-events-label">Eventos</span>
+					<span>Blood Castle</span>
+					<span>Devil Square</span>
+					<span>Chaos Castle</span>
+					<span>Invasiones</span>
+				</div>
+			</div>
 
 			<h3>Comienza tu aventura</h3>
 			<div class="getting-started">
@@ -80,24 +92,125 @@ const latestNews = (await fetchNewsPage(1, 3))?.items ?? [];
 			<ul class="server-info">
 				<li><strong>Mack:</strong> Eventos y GX</li>
 				<li><strong>Cosito:</strong> Game Experience</li>
-				<li><strong>Hanster:</strong> Atencion de bugs y errores de sistema</li>
-				<li><strong>Calab0y:</strong> Atencion de bugs y errores de sistema</li>
+				<li><strong>Hanster:</strong> Atención de bugs y errores de sistema</li>
+				<li><strong>Calab0y:</strong> Atención de bugs y errores de sistema</li>
 			</ul>
 		</section>
 	</Main>
 </Layout>
 
 <style>
-	h1{
-		font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	.first-section {
+		margin-top: 8px;
 	}
-	.news-more { margin: 0 0 10px; text-align: right; font-size: 13px; }
-	.server-info a { color: var(--color-danger); }
 
-	marquee :global(.gradient-text-hot) {
-		display: inline-block;
-		white-space: nowrap;
+	.news-more { margin: 0 0 10px; text-align: right; font-size: 13px; }
+
+	.notice {
+		margin: 0 0 10px;
+		padding: 10px 14px;
+		border-left: 3px solid var(--color-danger);
+		border-radius: 0 4px 4px 0;
+		background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+		font-size: 13px;
 	}
+
+	.notice strong { color: var(--color-danger); }
+
+	.server-sheet {
+		margin: 0 0 12px;
+		padding: 18px 20px 16px;
+		border: 1px solid color-mix(in srgb, var(--color-primary-soft) 45%, transparent);
+		border-radius: 6px;
+		background:
+			radial-gradient(ellipse at top, rgba(89, 43, 173, 0.28), transparent 65%),
+			rgba(0, 0, 0, 0.35);
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6), 0 0 14px rgba(89, 43, 173, 0.18);
+	}
+
+	/* columnas que se acomodan solas: sin huecos entre grupos de distinto alto */
+	.sheet-groups {
+		columns: 2 190px;
+		column-gap: 22px;
+	}
+
+	.sheet-groups section {
+		break-inside: avoid;
+		margin-bottom: 14px;
+	}
+
+	.sheet-events {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+		padding-top: 10px;
+		border-top: 1px solid color-mix(in srgb, var(--color-primary-soft) 25%, transparent);
+	}
+
+	.sheet-events span {
+		padding: 2px 8px;
+		border: 1px solid color-mix(in srgb, var(--color-danger) 45%, transparent);
+		border-radius: 999px;
+		font-size: 12px;
+		color: var(--color-danger);
+	}
+
+	.sheet-events .sheet-events-label {
+		padding: 0;
+		border: 0;
+		margin-right: 4px;
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: var(--color-primary-soft);
+	}
+
+	.sheet-groups h4 {
+		margin: 0 0 6px;
+		padding-bottom: 4px;
+		border-bottom: 1px solid color-mix(in srgb, var(--color-primary-soft) 35%, transparent);
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		color: var(--color-primary-soft);
+	}
+
+	.sheet-groups dl { margin: 0; }
+
+	.sheet-groups dl div {
+		display: flex;
+		align-items: baseline;
+		gap: 6px;
+		padding: 3px 0;
+		font-size: 13px;
+	}
+
+	/* línea punteada entre etiqueta y valor */
+	.sheet-groups dl div::after {
+		content: '';
+		order: 1;
+		flex: 1;
+		border-bottom: 1px dotted color-mix(in srgb, var(--fg) 30%, transparent);
+	}
+
+	.sheet-groups dt { opacity: 0.85; }
+
+	.sheet-groups dd {
+		order: 2;
+		margin: 0;
+		font-weight: 700;
+		color: var(--color-danger);
+		text-align: right;
+	}
+
+	.sheet-note {
+		margin: 6px 0 0;
+		font-size: 11px;
+		opacity: 0.7;
+	}
+
+	.server-info li { margin-bottom: 4px; }
 
 	.getting-started p {
 		line-height: 1.6;

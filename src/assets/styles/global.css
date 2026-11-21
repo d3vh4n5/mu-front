@@ -1,20 +1,27 @@
 @import url('./buttons.css');
+@import url('./forms.css');
 :root {
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
+    font-size: 14px;
+    line-height: 1.6;
 
-    --max-w: 800px;
+    --max-w: 980px;
     --bg: #070013;
     --fg: #cfb279;
     --bg-transparent: rgba(0, 0, 0, 0.3);
     --bg-blur: 4px;
     --shadow-color: rgba(15, 1, 29, 0.096);
+    /* Paleta: violeta Campana como color principal, dorado como acento, verde solo para la acción principal */
     --color-primary: #592bad;
+    --color-primary-hover: #6d3bd1;
+    --color-primary-soft: #b48cff;
     --color-succes: #2ecc71;
-    --color-danger: orange;
+    --color-danger: #f0b03c;
+    --color-gold-soft: #e8c98a;
     --color-error: #ff4d4d;
     --color-brown: #461303;
+    --font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 
 *,
@@ -49,17 +56,70 @@ body {
     width: 100%;
 }
 
+/* Título de sección: texto dorado con líneas violeta a los costados, sin caja */
 h3 {
-    margin: 20px 0;
-    padding: 6px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 48px 0 20px;
+    padding: 0;
     text-align: center;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-danger), var(--color-brown));
-    color: var(--bg);
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--color-danger);
+    text-shadow: 0 0 12px rgba(180, 140, 255, 0.25), 0 1px 2px #000;
+}
+
+h3::before,
+h3::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-primary-soft));
+}
+
+h3::after {
+    background: linear-gradient(90deg, var(--color-primary-soft), transparent);
+}
+
+/* h3 que no son títulos de sección (cajas, tarjetas, diálogos) */
+.table-card-title,
+.rank-box h3,
+.terms-content h3,
+dialog h3,
+h3.char-name {
+    display: block;
+    letter-spacing: normal;
+    text-shadow: none;
+}
+
+.table-card-title::before, .table-card-title::after,
+.rank-box h3::before, .rank-box h3::after,
+.terms-content h3::before, .terms-content h3::after,
+dialog h3::before, dialog h3::after,
+h3.char-name::before, h3.char-name::after {
+    content: none;
+}
+
+h1,
+h2 {
+    font-family: var(--font-display);
 }
 
 h1 {
-    font-size: clamp(20px, 5vw, 24px);
+    font-size: clamp(22px, 5vw, 28px);
     overflow-wrap: anywhere;
+}
+
+a {
+    color: var(--color-danger);
+    text-underline-offset: 2px;
+}
+
+a:hover {
+    color: var(--color-gold-soft);
 }
 
 p, li, td {
@@ -89,7 +149,7 @@ p, li, td {
 }
 
 .gradient-text-cold {
-  background: linear-gradient(90deg, var(--color-primary), var(--color-error));
+  background: linear-gradient(90deg, var(--color-primary-soft), #e6d4ff 45%, var(--color-danger));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -102,4 +162,183 @@ p, li, td {
   -webkit-background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
+}
+/* ---------- Movimiento ---------- */
+
+/*
+ * Presentación de entrada (ver Layout y Motion), solo la primera visita de la sesión:
+ *  1. se ve únicamente el banner, que se asienta con un zoom suave
+ *  2. la barra de navegación baja desde arriba
+ *  3. el contenedor sube desde el borde inferior de la pantalla, como un telón
+ * Mientras dura no se puede scrollear; cualquier clic/tecla/rueda la completa.
+ */
+@keyframes intro-hero {
+    from { transform: scale(1.12); filter: brightness(0.35) saturate(0.85); }
+    55% { filter: brightness(1) saturate(1.05); }
+    to { transform: scale(1); filter: none; }
+}
+
+@keyframes intro-nav {
+    from { translate: 0 -130%; opacity: 0; }
+    to { translate: 0 0; opacity: 1; }
+}
+
+@keyframes intro-curtain {
+    from { translate: 0 100vh; }
+    to { translate: 0 0; }
+}
+
+@keyframes intro-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+html.intro body {
+    overflow: hidden;
+}
+
+html.intro .hero-img {
+    animation: intro-hero 2.4s cubic-bezier(0.25, 0.6, 0.2, 1) both;
+}
+
+html.intro header nav {
+    animation: intro-nav 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 1.6s both;
+}
+
+html.intro main {
+    animation: intro-curtain 1.3s cubic-bezier(0.16, 0.84, 0.24, 1) 1.9s both;
+}
+
+html.intro footer {
+    animation: intro-fade 0.6s ease 3s both;
+}
+
+/* Portada: logo, título y botones aparecen sobre el banner, uno tras otro */
+@keyframes intro-rise {
+    from { opacity: 0; translate: 0 26px; }
+    to { opacity: 1; translate: 0 0; }
+}
+
+html.intro .hero-overlay .home-logo {
+    animation: intro-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 1.9s both;
+}
+
+html.intro .hero-overlay .page-heading {
+    animation: intro-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 2.15s both;
+}
+
+/* Páginas internas: el título de la franja aparece tras la barra */
+html.intro .strip-overlay .page-heading {
+    animation: intro-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 1.8s both;
+}
+
+html.intro .hero-overlay .intro-bottom {
+    animation: intro-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 2.4s both;
+}
+
+html.intro .hero-overlay .hero-scroll {
+    animation: intro-fade 0.6s ease 2.9s both;
+}
+
+/* Si el usuario interactúa, se completa enseguida */
+html.intro-skip .hero-img,
+html.intro-skip header nav,
+html.intro-skip main,
+html.intro-skip footer,
+html.intro-skip .hero-overlay .home-logo,
+html.intro-skip .hero-overlay .page-heading,
+html.intro-skip .hero-overlay .intro-bottom,
+html.intro-skip .strip-overlay .page-heading,
+html.intro-skip .hero-overlay .hero-scroll {
+    animation-delay: 0s !important;
+    animation-duration: 0.35s !important;
+}
+
+/* Aparición al hacer scroll (la clase la agrega Motion solo a lo que está fuera de pantalla) */
+.reveal {
+    opacity: 0;
+    translate: 0 28px;
+    transition: opacity 0.7s ease, translate 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    translate: 0 0;
+}
+
+/* La barra de navegación (más sólida al bajar) tiene sus estilos en Header.astro */
+
+.hero-img {
+    will-change: translate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.intro .hero-img,
+    html.intro header nav,
+    html.intro main,
+    html.intro footer,
+    html.intro .hero-overlay *,
+    html.intro .strip-overlay * {
+        animation: none;
+    }
+
+    .reveal {
+        opacity: 1;
+        translate: none;
+        transition: none;
+    }
+}
+
+/* Scroll suave para enlaces internos (la página scrollea dentro de <body>) */
+@media (prefers-reduced-motion: no-preference) {
+    html,
+    body {
+        scroll-behavior: smooth;
+    }
+}
+
+/* ---------- Barra de scroll ---------- */
+
+/* La página scrollea dentro de <body>. Se reserva siempre el lugar de la barra para que
+   el contenido no salte cuando aparece (al terminar la presentación o al cerrar el menú). */
+body {
+    scrollbar-gutter: stable;
+}
+
+/* Minimalista: fina, sin flechas, pulgar tenue que se ilumina al pasar el mouse.
+   Chrome/Edge/Safari usan ::-webkit-scrollbar; Firefox, scrollbar-width/color. */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(180, 140, 255, 0.28) padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(240, 176, 60, 0.6) padding-box;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: rgba(240, 176, 60, 0.8) padding-box;
+}
+
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-button {
+    display: none;
+    background: transparent;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(180, 140, 255, 0.35) transparent;
+    }
 }

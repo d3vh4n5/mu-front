@@ -2,10 +2,8 @@
 import Main from '../../components/Main.astro';
 import Layout from '../../layouts/Layout.astro';
 import MuTable from '../../components/MuTable.astro';
-import { Image } from 'astro:assets';
-import infoImg from '../../assets/img/top-decorator.gif'
 
-const title = "📜 Comandos del Servidor"
+const title = "Comandos del servidor"
 const columns = ["Comando", "Descripción"]
 const commands = [
     ["/reset", "Reinicia el personaje" ],
@@ -29,21 +27,11 @@ const commands = [
 
 ---
 
-<Layout>
+<Layout heading={{ eyebrow: "Guía del jugador", title: "Manual del juego", lead: "En esta sección encontrarás comandos y recomendaciones importantes para tu experiencia de juego." }} title="Manual del juego" description="Guía de Mu Campana: primeros pasos, cómo se juega, eventos del servidor y comandos para resetear y repartir puntos sin salir del juego.">
 	<Main>
 		<div class="container">
 
-			<Image
-				src={infoImg}
-				alt={"Imagen"}
-				class:list={"noticias"}
-			/>
 
-			<h1>Mu manual 📖</h1>
-					
-      <h4>
-        En esta sección encontrarás comandos y recomendaciones importantes para tu experiencia de juego.
-      </h4>
 			<p>
         Antes de jugar, descarga el cliente oficial, crea tu cuenta y revisa esta guía para conocer las herramientas disponibles dentro del juego.
 			</p>
@@ -102,10 +90,6 @@ const commands = [
 	</Main>
 </Layout>
 <style>
-	.noticias{
-		width: 100%;
-	}
-
   .guide-list {
     line-height: 1.7;
     padding-left: 24px;

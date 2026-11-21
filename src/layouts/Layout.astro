@@ -3,27 +3,137 @@ import { config } from "../constants/config";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import FireballRain from "../components/FireballRain.astro";
+import Motion from "../components/Motion.astro";
 import '../assets/styles/global.css'
+import heroImg from '../assets/img/hero2.jpg';
+import logoImg from '../assets/img/logo-campana.png';
 
-const { project } = config;
+interface Props {
+	/** Título de la página (sin el nombre del sitio). Si se omite, es la portada. */
+	title?: string;
+	/** Descripción para buscadores y vista previa al compartir (~150-160 caracteres). */
+	description?: string;
+	/** Imagen para compartir (URL absoluta o ruta). Por defecto, el banner. */
+	image?: string;
+	/** Páginas privadas o transitorias: no indexar. */
+	noindex?: boolean;
+	/** Tipo Open Graph */
+	type?: 'website' | 'article';
+	/** Fecha de publicación (artículos) */
+	publishedAt?: string;
+	/** Título visible de la página (h1). Va en la franja del encabezado o en el contenedor. */
+	heading?: { eyebrow?: string; title: string; lead?: string };
+}
+
+const { project, site, server } = config;
+const {
+	title,
+	description = site.description,
+	image,
+	noindex = false,
+	type = 'website',
+	publishedAt,
+	heading,
+} = Astro.props;
+
+// El contenedor (Main) lo lee si las páginas internas usan el banner completo
+Astro.locals.pageHeading = heading;
+
+const fullTitle = title
+	? `${title} | ${project.alias}`
+	: `${project.alias} · Servidor MU Online ${server.version}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL(image ?? heroImg.src, site.url).href;
+const isHome = Astro.url.pathname === '/';
+// Banner a pantalla completa solo en la portada y si la configuración lo pide
+const heroFull = isHome && config.home.hero === 'presentacion';
+// Páginas internas: franja baja con el título adentro
+const heroStrip = !isHome && config.pages.hero === 'franja';
+
+const jsonLd = isHome
+	? {
+		'@context': 'https://schema.org',
+		'@graph': [
+			{
+				'@type': 'WebSite',
+				'@id': `${site.url}/#website`,
+				name: project.alias,
+				url: site.url,
+				inLanguage: 'es',
+				description: site.description,
+			},
+			{
+				'@type': 'Organization',
+				'@id': `${site.url}/#organization`,
+				name: project.alias,
+				url: site.url,
+				logo: new URL(logoImg.src, site.url).href,
+				email: config.contact.email,
+			},
+		],
+	}
+	: null;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<!-- <link rel="icon" type="image/svg+xml" href="/favicon.svg" /> -->
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'} />
+		<meta name="theme-color" content="#070013" />
+
+		<!-- Vista previa al compartir (WhatsApp, Discord, Facebook, X) -->
+		<meta property="og:type" content={type} />
+		<meta property="og:site_name" content={project.alias} />
+		<meta property="og:locale" content={site.locale} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:alt" content={`${project.alias} · MU Online ${server.version}`} />
+		{type === 'article' && publishedAt && <meta property="article:published_time" content={publishedAt} />}
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
+
 		<link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />
 		<link rel="icon" href="/favicon.ico" sizes="any" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="sitemap" href="/sitemap.xml" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{project.name}</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet" />
+
+		{jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+		<!--
+			Presentación de entrada: al llegar desde afuera del sitio (buscador, link, URL
+			escrita) o al recargar; no al navegar entre páginas del sitio. Respeta
+			"reducir movimiento". Se activa antes del primer pintado para evitar parpadeo.
+			Sin JS no se agrega la clase y el contenido se ve normal (bueno para SEO).
+		-->
+		<script is:inline>
+			try {
+				var nav = performance.getEntriesByType('navigation')[0];
+				var reload = nav && nav.type === 'reload';
+				var fromOutside = !document.referrer || new URL(document.referrer).origin !== location.origin;
+				if ((reload || fromOutside) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+					document.documentElement.classList.add('intro');
+				}
+			} catch (e) {}
+		</script>
 	</head>
-	<body>
+	<body class:list={[{ 'is-home': isHome, 'hero-full': heroFull, 'hero-strip': heroStrip }]}>
 		<FireballRain />
-		<Header></Header>
+		<Header full={heroFull} strip={heroStrip} heading={heroStrip ? heading : undefined}><slot name="hero" slot="hero" /></Header>
 		<slot />
 		<Footer />
+		<Motion />
 	</body>
 </html>

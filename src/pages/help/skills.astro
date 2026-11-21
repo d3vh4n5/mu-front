@@ -2,8 +2,6 @@
 import Main from '../../components/Main.astro';
 import Layout from '../../layouts/Layout.astro';
 import { config } from '../../constants/config';
-import { Image } from 'astro:assets';
-import infoImg from '../../assets/img/top-decorator.gif'
 import MuTable from '../../components/MuTable.astro';
 
 const columns = ["ID", "Skill"]
@@ -70,23 +68,15 @@ const skills = [
 
 ---
 
-<Layout>
+<Layout heading={{ eyebrow: "Guía del jugador", title: "Lista de skills", lead: "Identificador de cada skill del servidor, útil para comandos y reportes." }} title="Lista de skills" description="Lista completa de skills de Mu Campana con su identificador, útil para comandos y reportes.">
 	<Main>
 		<div class="container">
 
-			<Image
-				src={infoImg}
-				alt={"Imagen"}
-				class:list={"noticias"}
-			/>
 
-			<h1></h1>
 
-			<MuTable 
-        title='⚔️ Skill list'
-        columns={columns}
-        data={skills}
-      />
+			<MuTable columns={columns} data={skills} />
+
+			<p class="back"><a href="/help">← Volver al manual</a></p>
 
 		</div>
 
@@ -94,7 +84,5 @@ const skills = [
 	</Main>
 </Layout>
 <style>
-	.noticias{
-		width: 100%;
-	}
+	.back { text-align: center; }
 </style>

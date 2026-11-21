@@ -1,30 +1,18 @@
 ---
 import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
-import infoImg from '../assets/img/top-decorator.gif'
-import { Image } from 'astro:assets';
 import TermsContent from '../components/TermsContent.astro';
 ---
 
-<Layout>
+<Layout heading={{ eyebrow: "Únete a la comunidad", title: "Crear cuenta", lead: "Prepara tu personaje y sé parte de la aventura desde el comienzo." }} title="Crear cuenta" description="Crea tu cuenta gratis en Mu Campana, servidor de MU Online 99b + DL. Recibe tu contraseña por correo y empieza tu aventura en minutos.">
 	<Main>
 		<div class="container">
-			<Image
-				src={infoImg}
-				alt=""
-				class:list={"noticias"}
-			/>
-			<div class="register-heading">
-				<p class="eyebrow">Únete a la comunidad</p>
-				<h1>Crear cuenta</h1>
-				<p>Prepara tu personaje y sé parte de la aventura desde el comienzo.</p>
-			</div>
 			<ol class="register-steps" aria-label="Cómo empezar a jugar">
 				<li><span class="step-num">1</span><span><strong>Crea tu cuenta</strong>Completa el formulario.</span></li>
 				<li><span class="step-num">2</span><span><strong>Revisa tu correo</strong>Allí llega tu contraseña.</span></li>
 				<li><span class="step-num">3</span><span><strong>Descarga y juega</strong>Instala el cliente y entra.</span></li>
 			</ol>
-			<section class="register-card">
+			<section class="form-card register-card">
 				<div id="message" role="status" aria-live="polite"></div>
 				<form id="registerForm">
 					<div class="input-group">
@@ -45,7 +33,7 @@ import TermsContent from '../components/TermsContent.astro';
 						<input type="radio" id="acceptTerms" name="terms" value="accepted" required>
 						<label for="acceptTerms">Acepto los <button type="button" class="terms-link" id="openTerms">términos y condiciones</button>.</label>
 					</div>
-					<button type="submit" class="btn btn-success primary">Crear mi cuenta</button>
+					<button type="submit" class="btn primary">Crear mi cuenta</button>
 					<p class="form-link"><a href="/forgot-password">¿Olvidaste tu contraseña?</a></p>
 				</form>
 			</section>
@@ -61,34 +49,8 @@ import TermsContent from '../components/TermsContent.astro';
 	</Main>
 </Layout>
 <style>
-	.noticias{
-		width: 100%;
-	}
-
 	.container {
 		width: 100%;
-	}
-
-	.register-heading {
-		text-align: center;
-	}
-
-	.eyebrow {
-		margin: 18px 0 0;
-		color: var(--color-danger);
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-	}
-
-	h1 {
-		text-align: center;
-		text-transform: uppercase;
-		letter-spacing: 2px; 
-	}
-
-	.register-heading > p:last-child {
-		font-size: 14px;
 	}
 
 	.register-steps {
@@ -130,50 +92,17 @@ import TermsContent from '../components/TermsContent.astro';
 	}
 
 	.register-card {
-		max-width: 460px;
-		margin: 20px auto 0;
-		padding: 24px;
-		box-sizing: border-box;
-		border: 1px solid color-mix(in srgb, var(--color-danger) 45%, transparent);
-		border-radius: 6px;
-		background-color: var(--bg-transparent);
-		box-shadow: 0 0 18px rgba(0, 0, 0, 0.45);
+		margin-top: 20px;
 	}
 
 	.input-group {
-		margin-bottom: 15px;
+		margin-bottom: 18px;
 	}
-	label {
-		display: block;
-		margin-bottom: 5px;
-		font-size: 13px;
-		font-weight: 700;
-	}
-
 	small {
 		display: block;
 		margin-top: 5px;
 		font-size: 11px;
 		opacity: 0.8;
-	}
-
-	input {
-		border: 1px solid var(--fg);
-		border-radius: 4px;
-		background-color: var(--fg);
-		color: var(--fg);
-		width: 100%;
-		padding: 10px;
-		box-sizing: border-box;
-		background-color: rgba(0, 0, 0, 0.2);
-	}
-	input:focus {
-		outline: 2px solid var(--color-primary);
-		outline-offset: 1px;
-	}
-
-	input::placeholder {
-		color: color-mix(in srgb, var(--fg) 65%, transparent);
 	}
 
 	#message:empty {
@@ -203,7 +132,7 @@ import TermsContent from '../components/TermsContent.astro';
 		padding: 0;
 		margin: 2px 0 0;
 		border: 0;
-		accent-color: var(--color-primary);
+		accent-color: var(--color-danger);
 		flex: 0 0 auto;
 	}
 
@@ -326,9 +255,6 @@ import TermsContent from '../components/TermsContent.astro';
 			grid-template-columns: 1fr;
 		}
 
-		.register-card {
-			padding: 18px 16px;
-		}
 	}
 </style>
 

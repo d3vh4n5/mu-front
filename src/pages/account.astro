@@ -1,8 +1,7 @@
 ---
 import Main from '../components/Main.astro';
 import Layout from '../layouts/Layout.astro';
-import infoImg from '../assets/img/top-decorator.gif';
-import { Image } from 'astro:assets';
+import PageHeading from '../components/PageHeading.astro';
 
 const commands = [
   ['/reset', 'Reiniciar el personaje'],
@@ -15,16 +14,14 @@ const commands = [
 ];
 ---
 
-<Layout>
+<Layout title="Mi cuenta" noindex>
   <Main>
     <div class="container">
-      <Image src={infoImg} alt="" class:list="noticias" />
 
       <div id="accountLoading" class="loading" role="status">Cargando tu cuenta...</div>
 
       <div id="accountContent" hidden>
-        <p class="eyebrow">Área privada</p>
-        <h1>Mi cuenta</h1>
+        <PageHeading eyebrow="Área privada" title="Mi cuenta" />
 
         <section class="panel account-summary" aria-labelledby="welcome">
           <h2 id="welcome">Hola</h2>
@@ -51,7 +48,7 @@ const commands = [
 
         <details class="panel commands">
           <summary>Comandos dentro del juego</summary>
-          <p class="note">Si estás conectado, podés hacer lo mismo desde el chat del juego:</p>
+          <p class="note">Si estás conectado, puedes hacer lo mismo desde el chat del juego:</p>
           <div class="command-list">
             {commands.map(([command, description]) => (
               <div><code>{command}</code><span>{description}</span></div>
@@ -62,7 +59,7 @@ const commands = [
 
         <section class="panel" aria-labelledby="supportTitle">
           <h2 id="supportTitle">Enviar un ticket</h2>
-          <p>¿Encontraste un problema o necesitás ayuda? Envía un mensaje al equipo de desarrollo.</p>
+          <p>¿Encontraste un problema o necesitas ayuda? Envía un mensaje al equipo de desarrollo.</p>
           <form id="supportForm" class="stack-form">
             <label for="supportSubject">Asunto</label>
             <input id="supportSubject" name="subject" type="text" placeholder="Ej: No puedo entrar al servidor" required>
@@ -75,8 +72,8 @@ const commands = [
       </div>
 
       <div id="loginRequired" class="login-required" hidden>
-        <h1>Sesión requerida</h1>
-        <p>Ingresá con tu cuenta para gestionar tus personajes.</p>
+        <PageHeading title="Sesión requerida" />
+        <p>Ingresa con tu cuenta para gestionar tus personajes.</p>
         <a class="btn" href="/">Volver al inicio</a>
       </div>
     </div>
@@ -84,22 +81,23 @@ const commands = [
 </Layout>
 
 <style>
-  .container, .noticias { width: 100%; }
+  .container { width: 100%; }
   [hidden] { display: none !important; }
 
-  h1 { margin: 6px 0 18px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
   h2 { margin: 0 0 12px; color: var(--color-danger); font-size: 16px; }
-  section, details { margin-top: 18px; }
+  section, details { margin-top: 22px; }
 
-  .eyebrow { margin: 18px 0 0; text-align: center; color: var(--color-danger); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
   .loading, .login-required { margin: 40px 0; text-align: center; }
   .login-required p { margin-bottom: 18px; }
 
   .panel {
-    padding: 16px;
-    border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
-    border-radius: 5px;
-    background: var(--bg-transparent);
+    padding: 20px;
+    border: 1px solid rgba(207, 178, 121, 0.25);
+    border-radius: 10px;
+    background:
+      radial-gradient(ellipse at top, rgba(120, 30, 10, 0.18), transparent 60%),
+      rgba(14, 6, 4, 0.5);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
   }
 
   .summary-grid {
@@ -148,19 +146,9 @@ const commands = [
 
   .empty { padding: 20px; text-align: center; line-height: 1.6; }
 
-  .stack-form { display: grid; gap: 6px; max-width: 420px; }
-  .stack-form label { margin-top: 6px; font-size: 11px; font-weight: 700; }
-  .stack-form input, .stack-form textarea {
-    width: 100%;
-    padding: 9px;
-    border: 1px solid color-mix(in srgb, var(--fg) 60%, transparent);
-    border-radius: 4px;
-    background: rgba(0, 0, 0, 0.25);
-    color: var(--fg);
-    font: inherit;
-  }
+  .stack-form { display: grid; gap: 6px; max-width: 460px; }
+  .stack-form label { margin: 8px 0 0; }
   .stack-form textarea { resize: vertical; }
-  .stack-form input:focus, .stack-form textarea:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
   .stack-form small { font-size: 10px; opacity: 0.75; line-height: 1.4; }
   .stack-form .btn { justify-self: start; margin-top: 8px; cursor: pointer; }
 
@@ -189,7 +177,7 @@ const commands = [
     border: 1px solid color-mix(in srgb, var(--fg) 35%, transparent);
     border-radius: 6px;
     background:
-      linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent 60%),
+      linear-gradient(135deg, rgba(120, 30, 10, 0.22), transparent 60%),
       var(--bg-transparent);
   }
   .char-card.is-banned { opacity: 0.6; }
@@ -242,11 +230,7 @@ const commands = [
   }
   .points-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
   .points-grid label { display: grid; gap: 4px; font-size: 10px; font-weight: 700; }
-  .points-grid input {
-    width: 100%; padding: 7px; border-radius: 4px;
-    border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent);
-    background: rgba(0, 0, 0, 0.3); color: var(--fg); font: inherit;
-  }
+  .points-grid input { padding: 7px 9px; }
   .points-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; font-size: 11px; }
   .points-footer .btn { cursor: pointer; }
   .points-remaining.over { color: var(--color-error); font-weight: 700; }
@@ -329,7 +313,7 @@ const commands = [
     const result = await response.json().catch(() => ({}));
     if (response.status === 401) {
       showLoginRequired();
-      throw new Error('Tu sesión expiró. Volvé a ingresar.');
+      throw new Error('Tu sesión expiró. Vuelve a ingresar.');
     }
     if (!response.ok) {
       const message = Array.isArray(result.message) ? result.message.join('. ') : result.message;
@@ -429,7 +413,7 @@ const commands = [
         </div>
         <div class="char-actions">
           <button type="button" class="btn btn-success" data-action="reset" ${locked || !c.canReset ? 'disabled' : ''} title="${esc(resetTitle)}">Reset</button>
-          <button type="button" class="btn" data-action="points" ${locked || c.freePoints <= 0 ? 'disabled' : ''} title="${esc(locked ? lockedTitle : c.freePoints > 0 ? 'Repartir puntos libres' : 'No tenés puntos libres')}">${openPointsFor === c.name ? 'Cerrar puntos' : 'Agregar puntos'}</button>
+          <button type="button" class="btn" data-action="points" ${locked || c.freePoints <= 0 ? 'disabled' : ''} title="${esc(locked ? lockedTitle : c.freePoints > 0 ? 'Repartir puntos libres' : 'No tienes puntos libres')}">${openPointsFor === c.name ? 'Cerrar puntos' : 'Agregar puntos'}</button>
           <button type="button" class="btn btn-ghost" data-action="pk-clear" ${locked || !c.pk.isPk ? 'disabled' : ''} title="${esc(pkTitle)}">Limpiar PK</button>
           <button type="button" class="btn btn-ghost" data-action="unstuck" ${locked ? 'disabled' : ''} title="${esc(locked ? lockedTitle : 'Mover a Lorencia')}">Desbloquear</button>
         </div>
@@ -444,7 +428,7 @@ const commands = [
     renderSummary(state);
     charactersEl.innerHTML = state.characters.length
       ? state.characters.map((c) => renderCharacter(c, state!)).join('')
-      : '<div class="panel empty">Todavía no tenés personajes. Entrá al juego y creá el primero.</div>';
+      : '<div class="panel empty">Todavía no tienes personajes. Entra al juego y crea el primero.</div>';
   }
 
   async function loadAccount() {
@@ -537,7 +521,7 @@ const commands = [
       if (value > 0) body[input.name] = value;
     });
     if (!Object.keys(body).length) {
-      cardMessages.set(name, { text: 'Indicá cuántos puntos querés agregar', type: 'error' });
+      cardMessages.set(name, { text: 'Indica cuántos puntos quieres agregar', type: 'error' });
       render();
       return;
     }

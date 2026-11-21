@@ -1,123 +1,279 @@
 ---
 import { Image } from "astro:assets"
 import heroImg from '../assets/img/hero2.jpg';
+// Versión sin el cartel "MU Online: Campana Server": en la portada su lugar lo ocupa la bienvenida
+import heroCleanImg from '../assets/img/hero-portada.jpg';
 import { config } from "../constants/config";
+import PageHeading from "./PageHeading.astro";
+import logoImg from '../assets/img/logo-campana.png';
+
+interface Props {
+    /** Portada: banner a pantalla completa con el contenido del slot "hero" encima */
+    full?: boolean;
+    /** Páginas internas: franja baja encuadrada en el arco, con el título de la página */
+    strip?: boolean;
+    heading?: { eyebrow?: string; title: string; lead?: string };
+}
+
+const { full = false, strip = false, heading } = Astro.props;
+// Portada y franja usan la imagen sin el cartel: su lugar lo ocupa el título
+const clean = full || strip;
 
 const pages = [
     { path: "/", name: "Inicio" },
     { path: "/news", name: "Noticias" },
     { path: "/register", name: "Crear cuenta" },
-    { path: "/account", name: "Mi cuenta", id: "accountLink", hidden: true },
-    { path: "/admin", name: "Admin", id: "adminLink", hidden: true },
-    { path: "/downloads", name: "Bajar Mu" },
-    { path: "/help", name: "Mu manual" },
+    { path: "/downloads", name: "Descargas" },
+    { path: "/help", name: "Manual" },
     { path: "/vip", name: "VIP" },
     { path: "/terms", name: "Términos" },
+    { path: "/admin", name: "Admin", admin: true },
 ]
+
+// Página actual: exacta para el inicio, por prefijo para el resto (p. ej. /news/12, /help/skills)
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (path: string) => path === '/' ? current === '/' : current === path || current.startsWith(path + '/');
 ---
 
 <header>
-    <nav class="bg-blur" aria-label="Principal">
-        <div class="nav-bar">
-            <a href="/" class="brand">{config.project.alias}</a>
-            <button
-                type="button"
-                class="menu-toggle"
-                aria-expanded="false"
-                aria-controls="navMenu"
-                aria-label="Abrir menú"
-            >
+    <nav class="site-nav" aria-label="Principal">
+        <div class="nav-inner">
+            <a href="/" class="brand" aria-label={`${config.project.alias}, ir al inicio`}>
+                <Image src={logoImg} alt="" width={36} height={36} class="brand-logo" />
+                <span class="brand-name">{config.project.alias}</span>
+            </a>
+
+            <ul class="nav-links">
+                {pages.map((page) => (
+                    <li class:list={[{ 'js-admin': page.admin }]} hidden={page.admin}>
+                        <a href={page.path} aria-current={isCurrent(page.path) ? 'page' : undefined}>{page.name}</a>
+                    </li>
+                ))}
+                <li class="js-logout" hidden><button type="button" class="logout-btn">Cerrar sesión</button></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="#login" class="btn nav-login js-login">Ingresar</a>
+                <button
+                    type="button"
+                    class="menu-toggle"
+                    aria-expanded="false"
+                    aria-controls="navDrawer"
+                    aria-label="Abrir menú"
+                >
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Menú lateral para celular/tablet: fuera de <nav> porque su desenfoque y su
+         animación de entrada recortarían un elemento fijo dentro de ella -->
+    <div class="nav-backdrop" aria-hidden="true"></div>
+    <aside id="navDrawer" class="nav-drawer" aria-label="Menú" inert>
+        <div class="drawer-head">
+            <a href="/" class="brand">
+                <Image src={logoImg} alt="" width={32} height={32} class="brand-logo" />
+                <span class="brand-name">{config.project.alias}</span>
+            </a>
+            <button type="button" class="drawer-close" aria-label="Cerrar menú">
                 <span aria-hidden="true"></span>
             </button>
         </div>
-        <ul id="navMenu">
-            {
-                pages.map( page => (<li id={page.id} hidden={page.hidden}>
-                    <a href={page.path}>{page.name}</a>
-                </li>) )
-            }
-            <li id="logoutLink" hidden><button type="button">Cerrar sesión</button></li>
+
+        <a href="#login" class="btn drawer-login js-login">Ingresar</a>
+
+        <ul class="drawer-links">
+            {pages.map((page) => (
+                <li class:list={[{ 'js-admin': page.admin }]} hidden={page.admin}>
+                    <a href={page.path} aria-current={isCurrent(page.path) ? 'page' : undefined}>{page.name}</a>
+                </li>
+            ))}
         </ul>
-    </nav>
-    <div class="container">
+
+        <button type="button" class="logout-btn drawer-logout js-logout" hidden>Cerrar sesión</button>
+    </aside>
+
+    <div class:list={['container', { full, strip }]}>
+        <!-- Capa que recorta y difumina la imagen: el parallax la mueve por dentro sin dejar un corte -->
+        <div class="hero-media">
         <Image
-            src={heroImg}
-            alt="Imagen principal"
+            src={clean ? heroCleanImg : heroImg}
+            alt={clean ? "Arco de Campana con guerreros de MU Online" : "Arco de Campana con guerreros de MU Online: Mu Campana Server"}
             class:list={"hero-img"}
+            loading="eager"
+            fetchpriority="high"
+            widths={[640, 1024]}
+            sizes="100vw"
         />
+        {full && <div class="hero-shade" aria-hidden="true"></div>}
+        {strip && <div class="strip-shade" aria-hidden="true"></div>}
+        </div>
+        {strip && heading && (
+            <div class="strip-overlay">
+                <PageHeading eyebrow={heading.eyebrow} title={heading.title} lead={heading.lead} />
+            </div>
+        )}
+        {full && (
+            <div class="hero-overlay">
+                <slot name="hero" />
+                <a href="#container" class="hero-scroll" aria-label="Ver el contenido">
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+        )}
     </div>
 </header>
 
 <style>
-    nav{
+    /* ---------- Barra de navegación ---------- */
+    .site-nav {
         position: fixed;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%);
-        margin: 0 auto;
-        width: 100%;
-        max-width: var(--max-w);
-        padding: 8px 16px;
-        border-radius: 0px 0px 5px 5px;
+        inset: 0 0 auto;
         z-index: 10;
+        background: linear-gradient(180deg, rgba(7, 0, 19, 0.82), rgba(7, 0, 19, 0.45));
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border-bottom: 1px solid rgba(180, 140, 255, 0.12);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     }
-    ul{
-        margin: 0px;
-        padding: 0px;
+
+    /* Al bajar: sólida, con sombra y filete dorado */
+    .site-nav.scrolled {
+        background: rgba(9, 2, 22, 0.94);
+        border-bottom-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    .nav-inner {
         display: flex;
-        gap: 20px;
-    }
-
-    li{
-        list-style: none;
-    }
-
-    a{
-        text-decoration: none;
-        color: var(--fg);
-    }
-
-    li[hidden] { display: none; }
-
-    button {
-        border: 0;
-        padding: 0;
-        background: transparent;
-        color: var(--fg);
-        font: inherit;
-        cursor: pointer;
-    }
-
-    .nav-bar {
-        display: none;
+        align-items: center;
+        gap: 24px;
+        max-width: calc(var(--max-w) + 160px);
+        height: 60px;
+        margin: 0 auto;
+        padding: 0 20px;
     }
 
     .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        text-decoration: none;
+    }
+
+    .brand-logo {
+        width: 36px;
+        height: 36px;
+        filter: drop-shadow(0 0 8px rgba(140, 90, 255, 0.55));
+    }
+
+    .brand-name {
+        font-family: var(--font-display);
+        font-size: 17px;
         font-weight: 700;
-        font-size: 14px;
         letter-spacing: 1px;
-        text-transform: uppercase;
+        background: linear-gradient(90deg, #e6d4ff, var(--color-danger));
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+    }
+
+    li[hidden],
+    .js-logout[hidden] {
+        display: none;
+    }
+
+    /* Links: al pasar el mouse, fondo tenue redondeado; la página actual, en dorado */
+    .nav-links {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        flex: 1;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .nav-links a,
+    .nav-links button {
+        display: block;
+        padding: 7px 12px;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        color: var(--fg);
+        font: inherit;
+        font-size: 14px;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+        background: rgba(255, 255, 255, 0.07);
+        color: #fff1d6;
+    }
+
+    .nav-links a[aria-current="page"] {
+        color: var(--color-danger);
+        font-weight: 600;
+    }
+
+    .logout-btn {
+        opacity: 0.75;
+    }
+
+    .logout-btn:hover {
+        opacity: 1;
+        color: var(--color-error) !important;
+    }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .nav-login {
+        padding: 7px 16px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    /* ---------- Botón de menú (hamburguesa) ---------- */
+    .menu-toggle,
+    .drawer-close {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border: 1px solid rgba(207, 178, 121, 0.25);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.25);
+        cursor: pointer;
     }
 
     .menu-toggle {
-        position: relative;
-        width: 36px;
-        height: 36px;
-        border-radius: 4px;
+        display: none;
     }
 
     .menu-toggle span,
     .menu-toggle span::before,
     .menu-toggle span::after {
         position: absolute;
-        left: 8px;
-        width: 20px;
+        left: 10px;
+        width: 18px;
         height: 2px;
+        border-radius: 2px;
         background: var(--fg);
-        transition: transform 180ms ease, opacity 180ms ease;
     }
 
-    .menu-toggle span { top: 17px; }
+    .menu-toggle span { top: 19px; }
     .menu-toggle span::before,
     .menu-toggle span::after {
         content: '';
@@ -126,101 +282,390 @@ const pages = [
     .menu-toggle span::before { top: -6px; }
     .menu-toggle span::after { top: 6px; }
 
-    nav.open .menu-toggle span { background: transparent; }
-    nav.open .menu-toggle span::before { transform: translateY(6px) rotate(45deg); }
-    nav.open .menu-toggle span::after { transform: translateY(-6px) rotate(-45deg); }
-
-    .container {
-        margin: 0 auto;
-        width: 100%;
-        height: 50vh;
-        max-width: 1300px;
+    /* cruz del botón cerrar */
+    .drawer-close span::before,
+    .drawer-close span::after {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 19px;
+        width: 18px;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--fg);
     }
-    .hero-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        mask-image: linear-gradient(#000 60%, #0000)
-    }
+    .drawer-close span::before { transform: rotate(45deg); }
+    .drawer-close span::after { transform: rotate(-45deg); }
 
-    @media (max-width: 820px) {
-        ul {
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px 16px;
-        }
+    /* ---------- Menú lateral (celular/tablet) ---------- */
+    .nav-backdrop,
+    .nav-drawer {
+        display: none;
     }
 
-    @media (max-width: 640px) {
-        nav {
-            padding: 6px 16px;
-            border-radius: 0;
+    @media (max-width: 1000px) {
+        .nav-inner {
+            height: 56px;
+            padding: 0 14px;
+            gap: 12px;
         }
 
-        .nav-bar {
+        .nav-links,
+        .nav-actions .nav-login {
+            display: none;
+        }
+
+        .nav-actions {
+            margin-left: auto;
+        }
+
+        .menu-toggle {
+            display: block;
+        }
+
+        .nav-backdrop {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            background: rgba(3, 0, 10, 0.6);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+
+        .nav-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-drawer {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 31;
+            width: min(78vw, 340px);
+            padding: 14px 16px 20px;
+            overflow-y: auto;
+            background:
+                radial-gradient(ellipse at top right, rgba(89, 43, 173, 0.3), transparent 60%),
+                #0b0418;
+            border-left: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
+            box-shadow: -18px 0 40px rgba(0, 0, 0, 0.6);
+            transform: translateX(100%);
+            transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .nav-drawer.open {
+            transform: none;
+        }
+
+        .drawer-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(207, 178, 121, 0.15);
         }
 
-        ul {
-            display: none;
-            flex-direction: column;
-            gap: 0;
-            padding: 6px 0 4px;
+        .drawer-head .brand-name { font-size: 16px; }
+        .drawer-head .brand-logo { width: 32px; height: 32px; }
+
+        .drawer-login {
+            margin: 16px 0 10px;
+            padding: 11px 16px;
+            text-align: center;
+            font-size: 15px;
         }
 
-        nav.open ul {
+        .drawer-links {
             display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
         }
 
-        li a,
-        li button {
+        .drawer-links a {
             display: block;
-            width: 100%;
-            padding: 12px 4px;
-            text-align: left;
-            border-top: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
-            font-size: 14px;
+            padding: 13px 14px;
+            border-radius: 8px;
+            color: var(--fg);
+            font-size: 15px;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .container {
-            height: 32vh;
-            min-height: 180px;
+        .drawer-links a:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff1d6;
+        }
+
+        .drawer-links a[aria-current="page"] {
+            color: var(--color-danger);
+            font-weight: 600;
+            background: rgba(240, 176, 60, 0.08);
+        }
+
+        .drawer-logout {
+            margin-top: auto;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 8px;
+            background: none;
+            color: var(--fg);
+            font: inherit;
+            font-size: 14px;
+            cursor: pointer;
         }
     }
+
+    @media (max-width: 480px) {
+        .brand-name { font-size: 15px; }
+        .brand-logo { width: 32px; height: 32px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .nav-drawer,
+        .nav-backdrop {
+            transition: none !important;
+        }
+    }
+
+    /* Páginas internas: proporción real de la imagen (se ven arco y personajes completos) */
+    .container {
+        position: relative;
+        margin: 0 auto;
+        width: 100%;
+        aspect-ratio: 1024 / 572;
+        max-height: 85vh;
+        max-width: 1300px;
+    }
+
+    /* Portada: el banner es la presentación, a pantalla completa */
+    .container.full {
+        aspect-ratio: auto;
+        height: 100vh;
+        min-height: 600px;
+        max-height: none;
+        max-width: none;
+    }
+
+    /* Páginas internas en modo franja: encabezado bajo, encuadrado en el arco y el medallón */
+    .container.strip {
+        aspect-ratio: auto;
+        height: clamp(300px, 40vh, 400px);
+        max-height: none;
+        max-width: none;
+    }
+
+    .container.strip .hero-img {
+        object-position: center 28%;
+    }
+
+    .strip-shade {
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 60% 70% at 50% 58%, rgba(7, 0, 19, 0.55), transparent 75%),
+            linear-gradient(to top, rgba(7, 0, 19, 0.9) 0%, rgba(7, 0, 19, 0.3) 45%, rgba(7, 0, 19, 0.35) 100%);
+        pointer-events: none;
+    }
+
+    /* título centrado bajo el arco (debajo de la barra fija) */
+    .strip-overlay {
+        position: absolute;
+        inset: 60px 0 32px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+    }
+
+    .strip-overlay :global(.page-heading) {
+        margin: 0;
+        padding: 0;
+    }
+
+    .strip-overlay :global(.ph-lead) {
+        color: #f3e8d2;
+        text-shadow: 0 1px 3px #000, 0 0 12px rgba(0, 0, 0, 0.85);
+    }
+
+    @media (max-width: 760px) {
+        .container.strip {
+            height: clamp(230px, 34vh, 300px);
+        }
+
+        .strip-overlay {
+            inset: 56px 0 24px;
+        }
+
+        .strip-overlay :global(.ph-lead) {
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .strip-overlay :global(.ph-ornament) {
+            margin-top: 8px;
+        }
+    }
+
+    /* Sombra inferior para que el texto sobre la imagen se lea */
+    .hero-shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(7, 0, 19, 0.92) 0%, rgba(7, 0, 19, 0.55) 26%, transparent 52%);
+        pointer-events: none;
+    }
+
+    /* Ocupa todo el banner: abajo van bajada, botones y flecha; el logo y el título
+       se ubican en el hueco del arco (ver HomeIntro) */
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 0 16px 4vh;
+    }
+
+    .hero-scroll {
+        display: block;
+        width: 34px;
+        height: 34px;
+        margin-top: 10px;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--color-danger) 55%, transparent);
+        position: relative;
+        animation: hero-bounce 2.2s ease-in-out infinite;
+    }
+
+    .hero-scroll span {
+        position: absolute;
+        left: 50%;
+        top: 44%;
+        width: 9px;
+        height: 9px;
+        border-right: 2px solid var(--color-danger);
+        border-bottom: 2px solid var(--color-danger);
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    @keyframes hero-bounce {
+        0%, 100% { translate: 0 0; }
+        50% { translate: 0 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-scroll { animation: none; }
+    }
+
+    /* Celular/tablet vertical: proporción real para no recortar el arco ni los personajes */
+    /* Celular: la imagen no entra a pantalla completa en vertical; el contenido va debajo */
+    @media (max-width: 760px) {
+        .container.full {
+            height: auto;
+            min-height: 0;
+            aspect-ratio: auto;
+        }
+
+        /* en celular la capa de la imagen va en el flujo, con la proporción real */
+        .container.full .hero-media {
+            position: relative;
+            aspect-ratio: 1024 / 572;
+        }
+
+        .hero-shade,
+        .hero-scroll {
+            display: none;
+        }
+
+        .hero-overlay {
+            position: static;
+            margin-top: -28px;
+        }
+    }
+    .hero-media {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        mask-image: linear-gradient(#000 80%, #0000);
+        -webkit-mask-image: linear-gradient(#000 80%, #0000);
+    }
+
+    .hero-img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+    }
+
 </style>
 
 <script>
     import { getSession, isAdmin, logout } from '../lib/client/session';
 
+    const loginLinks = document.querySelectorAll<HTMLAnchorElement>('.js-login');
+
+    // Páginas sin el widget de login: el acceso lleva al del inicio
+    if (!document.getElementById('login')) {
+        loginLinks.forEach((link) => link.setAttribute('href', '/#login'));
+    }
+
     getSession().then((session) => {
         if (!session.authenticated) return;
-        document.getElementById('accountLink')?.removeAttribute('hidden');
-        document.getElementById('logoutLink')?.removeAttribute('hidden');
-        if (isAdmin(session)) document.getElementById('adminLink')?.removeAttribute('hidden');
+        loginLinks.forEach((link) => {
+            link.href = '/account';
+            link.textContent = 'Mi cuenta';
+        });
+        document.querySelectorAll('.js-logout').forEach((el) => el.removeAttribute('hidden'));
+        if (isAdmin(session)) document.querySelectorAll('.js-admin').forEach((el) => el.removeAttribute('hidden'));
     });
 
-    const nav = document.querySelector('header nav');
-    const menuToggle = nav?.querySelector<HTMLButtonElement>('.menu-toggle');
+    // ---- Menú lateral (celular/tablet) ----
+    const drawer = document.getElementById('navDrawer');
+    const backdrop = document.querySelector<HTMLElement>('.nav-backdrop');
+    const menuToggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+    const drawerClose = drawer?.querySelector<HTMLButtonElement>('.drawer-close');
 
     const setMenuOpen = (open: boolean) => {
-        nav?.classList.toggle('open', open);
+        if (!drawer) return;
+        drawer.classList.toggle('open', open);
+        backdrop?.classList.toggle('open', open);
+        drawer.inert = !open;
         menuToggle?.setAttribute('aria-expanded', String(open));
-        menuToggle?.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+        // la página scrollea dentro de <body>: se bloquea mientras el menú está abierto
+        document.body.style.overflow = open ? 'hidden' : '';
+        if (open) drawerClose?.focus();
+        else if (document.activeElement && drawer.contains(document.activeElement)) menuToggle?.focus();
     };
 
-    menuToggle?.addEventListener('click', () => {
-        setMenuOpen(!nav?.classList.contains('open'));
-    });
+    menuToggle?.addEventListener('click', () => setMenuOpen(true));
+    drawerClose?.addEventListener('click', () => setMenuOpen(false));
+    backdrop?.addEventListener('click', () => setMenuOpen(false));
+    drawer?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenuOpen(false)));
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') setMenuOpen(false);
+        if (event.key === 'Escape' && drawer?.classList.contains('open')) setMenuOpen(false);
     });
 
-    document.addEventListener('click', (event) => {
-        if (nav && !nav.contains(event.target as Node)) setMenuOpen(false);
+    // si se agranda la ventana con el menú abierto, se cierra
+    matchMedia('(min-width: 1001px)').addEventListener('change', (event) => {
+        if (event.matches) setMenuOpen(false);
     });
 
-    document.querySelector('#logoutLink button')?.addEventListener('click', () => logout('/'));
+    document.querySelectorAll('.logout-btn').forEach((btn) => btn.addEventListener('click', () => logout('/')));
 </script>
