@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 // Solo estas rutas se reenvían a la API (/api/v2/admin/...).
 // La autorización real (rol admin verificado en la base) la hace la API.
 const ALLOWED: Record<string, RegExp[]> = {
-  GET: [/^search$/, /^online$/, /^audit$/, /^updates$/, /^accounts\/[^/]{1,10}$/, /^news$/, /^news\/\d{1,9}$/],
+  GET: [/^search$/, /^online$/, /^audit$/, /^updates$/, /^vips$/, /^accounts\/[^/]{1,10}$/, /^news$/, /^news\/\d{1,9}$/],
   POST: [
     /^accounts\/[^/]{1,10}\/(ban|unban|vip)$/,
     /^characters\/[^/]{1,10}\/(ban|unban|gm|ungm)$/,

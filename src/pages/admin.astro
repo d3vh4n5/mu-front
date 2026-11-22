@@ -23,6 +23,7 @@ import Layout from '../layouts/Layout.astro';
 
       <nav class="tabs" role="tablist" aria-label="Secciones">
         <button type="button" role="tab" class="tab" data-tab="search" aria-selected="true">Buscar</button>
+        <button type="button" role="tab" class="tab" data-tab="vip" aria-selected="false">VIP</button>
         <button type="button" role="tab" class="tab" data-tab="online" aria-selected="false">Online</button>
         <button type="button" role="tab" class="tab" data-tab="audit" aria-selected="false">Auditoría</button>
         <button type="button" role="tab" class="tab" data-tab="updates" aria-selected="false">Actualizaciones</button>
@@ -40,6 +41,89 @@ import Layout from '../layouts/Layout.astro';
         </form>
         <div id="searchResults" class="results"></div>
         <div id="accountDetail"></div>
+      </section>
+
+      <section data-panel="vip" class="panel" hidden>
+        <div class="panel-title">
+          <h2>Cuentas VIP</h2>
+          <button type="button" class="link-button" id="refreshVip">Actualizar</button>
+        </div>
+
+        <div id="vipSummary" class="vip-summary"></div>
+
+        <form id="vipAssignForm" class="detail vip-card" novalidate>
+          <div class="vip-card-head">
+            <h3>Asignar o extender VIP</h3>
+            <p class="muted">También podés usar "+30 días" o "Editar" desde la tabla.</p>
+          </div>
+
+          <div class="vip-fields">
+            <div class="vip-field">
+              <label for="vipUser">Cuenta</label>
+              <input id="vipUser" name="username" type="text" maxlength="10" required autocomplete="off" spellcheck="false" placeholder="usuario">
+            </div>
+
+            <div class="vip-field">
+              <span class="vip-label" id="vipLevelLabel">Nivel</span>
+              <div class="seg" role="radiogroup" aria-labelledby="vipLevelLabel">
+                <label><input type="radio" name="level" value="1"><span>VIP 1</span></label>
+                <label><input type="radio" name="level" value="2"><span>VIP 2</span></label>
+                <label><input type="radio" name="level" value="3" checked><span>VIP 3</span></label>
+                <label class="seg-danger"><input type="radio" name="level" value="0"><span>Quitar</span></label>
+              </div>
+            </div>
+
+            <div class="vip-field" data-vip-only>
+              <label for="vipDays">Duración</label>
+              <div class="vip-days">
+                <div class="vip-days-input">
+                  <input id="vipDays" name="days" type="number" min="1" max="3650" value="30" inputmode="numeric">
+                  <span>días</span>
+                </div>
+                <div class="chips" aria-label="Duraciones rápidas">
+                  <button type="button" class="chip" data-days="7">7</button>
+                  <button type="button" class="chip" data-days="15">15</button>
+                  <button type="button" class="chip is-active" data-days="30">30</button>
+                  <button type="button" class="chip" data-days="90">90</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="vip-field" data-vip-only>
+              <span class="vip-label" id="vipModeLabel">Modo</span>
+              <div class="seg" role="radiogroup" aria-labelledby="vipModeLabel">
+                <label><input type="radio" name="mode" value="extend" checked><span>Extender</span></label>
+                <label><input type="radio" name="mode" value="set"><span>Desde hoy</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="vip-card-foot">
+            <p id="vipAssignHint" class="vip-hint" aria-live="polite"></p>
+            <button type="submit" class="btn" id="vipAssignSubmit">Guardar VIP</button>
+          </div>
+        </form>
+
+        <div class="vip-toolbar">
+          <label class="sr-only" for="vipFilterText">Filtrar por cuenta o correo</label>
+          <input id="vipFilterText" type="search" placeholder="Filtrar por cuenta o correo..." autocomplete="off">
+          <label class="sr-only" for="vipFilterStatus">Estado</label>
+          <select id="vipFilterStatus">
+            <option value="active">Vigentes</option>
+            <option value="expiring">Vencen en 7 días</option>
+            <option value="expired">Vencidos</option>
+            <option value="all">Todos</option>
+          </select>
+          <label class="sr-only" for="vipFilterLevel">Nivel</label>
+          <select id="vipFilterLevel">
+            <option value="">Todos los niveles</option>
+            <option value="1">VIP 1</option>
+            <option value="2">VIP 2</option>
+            <option value="3">VIP 3</option>
+          </select>
+        </div>
+
+        <div id="vipList"></div>
       </section>
 
       <section data-panel="online" class="panel" hidden>
@@ -258,13 +342,84 @@ import Layout from '../layouts/Layout.astro';
   .detail-grid dd { margin: 3px 0 0; font-size: 13px; overflow-wrap: anywhere; }
   .detail h4 { margin: 18px 0 8px; color: var(--color-danger); font-size: 13px; }
 
-  .vip-form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
-  .vip-form label { display: grid; gap: 4px; font-size: 10px; font-weight: 700; }
-  .vip-form select, .vip-form input {
-    padding: 7px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--fg) 55%, transparent);
-    background: #120c1c; color: var(--fg); font: inherit;
-  }
+  /* Formulario VIP compacto (detalle de cuenta) */
+  .vip-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+  .vip-form label { display: grid; gap: 5px; margin: 0; font-size: 11px; }
+  .vip-form select, .vip-form input { box-sizing: border-box; height: 36px; padding: 0 10px; font-size: 13px; }
+  .vip-form select { width: auto; min-width: 150px; }
   .vip-form input { width: 90px; }
+  .vip-form .btn { height: 36px; padding: 0 16px !important; }
+
+  /* Resumen */
+  .vip-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .vip-summary:empty { display: none; }
+  .vip-stat { margin: 0; padding: 12px 14px; border-radius: 8px; border: 1px solid color-mix(in srgb, var(--fg) 22%, transparent); background: rgba(0, 0, 0, 0.3); }
+  .vip-stat dt { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.65; }
+  .vip-stat dd { margin: 6px 0 0; font-size: 24px; font-weight: 700; line-height: 1; color: var(--color-danger); }
+
+  /* Tarjeta para asignar VIP */
+  .vip-card { margin: 0 0 16px; padding: 18px; }
+  .vip-card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin-bottom: 14px; }
+  .vip-card-head h3 { margin: 0; padding: 0; background: none; text-align: left; color: var(--fg); font-size: 15px; }
+  .vip-card-head p { margin: 0; font-size: 11px; }
+  .vip-fields { display: grid; grid-template-columns: minmax(150px, 1fr) auto auto auto; gap: 14px 18px; align-items: start; }
+  .vip-field { display: grid; gap: 6px; min-width: 0; }
+  .vip-field > label, .vip-label {
+    margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--color-gold-soft);
+  }
+  .vip-card input[type="text"], .vip-card input[type="number"] { box-sizing: border-box; height: 38px; padding: 0 12px; }
+
+  .seg { display: inline-flex; height: 38px; box-sizing: border-box; border-radius: 6px; overflow: hidden;
+    border: 1px solid rgba(207, 178, 121, 0.28); background: rgba(22, 10, 6, 0.72); }
+  .seg label { position: relative; display: flex; margin: 0; cursor: pointer; }
+  .seg label + label { border-left: 1px solid rgba(207, 178, 121, 0.18); }
+  .seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .seg span { display: flex; align-items: center; padding: 0 14px; font-size: 13px; font-weight: 600; color: var(--fg); white-space: nowrap; transition: background-color 0.12s, color 0.12s; }
+  .seg label:hover span { background: rgba(207, 178, 121, 0.08); }
+  .seg input:checked + span { background: var(--color-primary); color: #fff; }
+  .seg .seg-danger input:checked + span { background: #a3262a; }
+  .seg input:focus-visible + span { box-shadow: inset 0 0 0 2px var(--color-gold-soft); }
+
+  .vip-days { display: flex; align-items: center; gap: 8px; }
+  .vip-days-input { position: relative; }
+  .vip-card .vip-days-input input { width: 104px; padding-right: 40px; }
+  .vip-days-input span { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.6; pointer-events: none; }
+  .chips { display: flex; gap: 4px; }
+  .chip {
+    height: 30px; min-width: 34px; padding: 0 8px; border-radius: 15px; cursor: pointer;
+    border: 1px solid rgba(207, 178, 121, 0.28); background: transparent; color: var(--fg); font: inherit; font-size: 12px; font-weight: 600;
+  }
+  .chip:hover { border-color: var(--color-gold-soft); }
+  .chip.is-active { border-color: var(--color-primary-soft); background: color-mix(in srgb, var(--color-primary) 45%, transparent); color: #fff; }
+
+  .vip-card-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid color-mix(in srgb, var(--fg) 15%, transparent); }
+  .vip-hint { flex: 1 1 260px; margin: 0; font-size: 12px; line-height: 1.5; opacity: 0.85; }
+  .vip-hint strong { color: var(--color-gold-soft); }
+  .vip-card-foot .btn { height: 38px; padding: 0 22px; cursor: pointer; }
+  .vip-card.is-remove [data-vip-only] { display: none; }
+  .vip-card.is-remove .vip-fields { grid-template-columns: minmax(150px, 1fr) auto; }
+
+  /* Filtros de la tabla */
+  .vip-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .vip-toolbar input, .vip-toolbar select { box-sizing: border-box; height: 38px; padding: 0 12px; font-size: 13px; }
+  .vip-toolbar input { flex: 1 1 220px; width: auto; }
+  .vip-toolbar select { flex: 0 0 auto; width: auto; min-width: 160px; }
+
+  @media (max-width: 860px) {
+    .vip-fields { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .vip-fields, .vip-card.is-remove .vip-fields { grid-template-columns: 1fr; }
+    .seg { width: 100%; }
+    .seg label { flex: 1; }
+    .seg span { justify-content: center; width: 100%; padding: 0 6px; }
+    .vip-toolbar select { flex: 1 1 140px; }
+    .vip-card-foot .btn { width: 100%; }
+  }
+  .st-vip-active { color: var(--color-succes); }
+  .st-vip-expiring { color: var(--color-danger); }
+  .st-vip-expired { color: color-mix(in srgb, var(--fg) 70%, transparent); }
 
   .table-scroll { overflow-x: auto; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent); }
   .adm-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -408,6 +563,7 @@ import Layout from '../layouts/Layout.astro';
 
   // ------------------------------------------------------------------ tabs
   const loaders: Record<string, () => void> = {
+    vip: () => loadVips(),
     online: () => loadOnline(),
     audit: () => loadAudit(),
     updates: () => loadUpdates(),
@@ -551,6 +707,12 @@ import Layout from '../layouts/Layout.astro';
           <label>Días
             <input type="number" name="days" min="1" max="3650" value="30">
           </label>
+          <label>Modo
+            <select name="mode">
+              ${account.accountLevel > 0 ? '<option value="extend">Extender vencimiento</option>' : ''}
+              <option value="set">Reemplazar (desde hoy)</option>
+            </select>
+          </label>
           <button type="submit" class="btn adm-small">Guardar VIP</button>
         </form>
 
@@ -679,15 +841,231 @@ import Layout from '../layouts/Layout.astro';
     event.preventDefault();
     const username = form.closest<HTMLElement>('[data-account]')?.dataset.account;
     const data = new FormData(form);
-    const level = Number(data.get('level'));
-    const days = Number(data.get('days'));
-    const message = level > 0
-      ? `Asignar VIP ${level} por ${days} días a ${username}. Reemplaza el VIP actual.`
-      : `Quitar el VIP de ${username}.`;
-    askConfirm({ title: 'Cambiar VIP', message, reasonRequired: false, confirmLabel: 'Guardar' },
-      (reason) => runAndRefresh(`accounts/${encodeURIComponent(username!)}/vip`, {
-        level, ...(level > 0 ? { days } : {}), ...(reason ? { reason } : {}),
-      }));
+    confirmVip(username!, Number(data.get('level')), Number(data.get('days')), (data.get('mode') as VipMode) ?? 'set');
+  });
+
+  type VipMode = 'set' | 'extend';
+
+  /** Pide confirmación y aplica el cambio de VIP; refresca el detalle y la lista VIP. */
+  function confirmVip(username: string, level: number, days: number, mode: VipMode) {
+    if (level > 0 && (!Number.isInteger(days) || days < 1 || days > 3650)) {
+      setFlash('Indicá una duración entre 1 y 3650 días.', 'error');
+      return;
+    }
+    const message = level === 0
+      ? `Quitar el VIP de ${username}. La cuenta pasa a FREE.`
+      : mode === 'extend'
+        ? `Sumar ${days} días de VIP ${level} a ${username}. Si el VIP sigue vigente se suma a su vencimiento; si no, cuenta desde hoy.`
+        : `Asignar VIP ${level} por ${days} días a ${username}, desde hoy. Reemplaza el VIP actual.`;
+    askConfirm({ title: level === 0 ? 'Quitar VIP' : 'Cambiar VIP', message, reasonRequired: false, confirmLabel: level === 0 ? 'Quitar' : 'Guardar', danger: level === 0 },
+      async (reason) => {
+        const result = await api<{ message: string }>(`accounts/${encodeURIComponent(username)}/vip`, {
+          method: 'POST',
+          body: { level, ...(level > 0 ? { days, mode } : {}), ...(reason ? { reason } : {}) },
+        });
+        setFlash(result.message, 'success');
+        if (currentAccount === username) await openAccount(currentAccount);
+        if (vipLoaded) await loadVips();
+      });
+  }
+
+  // ------------------------------------------------------------------- vip
+  type VipEntry = {
+    username: string; name: string; email: string; status: AccountStatus;
+    storedAccountLevel: number; accountLevel: number; expiresAt: string | null; active: boolean; online: boolean;
+  };
+  type VipList = { items: VipEntry[]; summary: { total: number; expired: number; byLevel: Record<string, number> }; checkedAt: string };
+
+  const DAY_MS = 86_400_000;
+  let vipData: VipList | null = null;
+  let vipLoaded = false;
+
+  function vipRemaining(v: VipEntry) {
+    if (!v.active || !v.expiresAt) return { label: 'Vencido', cls: 'expired' };
+    const ms = new Date(v.expiresAt).getTime() - Date.now();
+    const days = Math.floor(ms / DAY_MS);
+    const label = days >= 1 ? `${days} día${days === 1 ? '' : 's'}` : `${Math.max(1, Math.floor(ms / 3_600_000))} h`;
+    return { label, cls: ms < 7 * DAY_MS ? 'expiring' : 'active' };
+  }
+
+  function renderVipSummary(data: VipList) {
+    const box = $('vipSummary');
+    if (!box) return;
+    const expiring = data.items.filter((v) => vipRemaining(v).cls === 'expiring').length;
+    const stat = (label: string, value: number) => `<dl class="vip-stat"><dt>${esc(label)}</dt><dd>${fmtNum(value)}</dd></dl>`;
+    box.innerHTML = [
+      stat('VIP vigentes', data.summary.total),
+      stat('VIP 1', data.summary.byLevel['1'] ?? 0),
+      stat('VIP 2', data.summary.byLevel['2'] ?? 0),
+      stat('VIP 3', data.summary.byLevel['3'] ?? 0),
+      stat('Vencen en 7 días', expiring),
+      stat('Vencidos', data.summary.expired),
+    ].join('');
+  }
+
+  function renderVipList() {
+    const list = $('vipList');
+    if (!list || !vipData) return;
+    const text = (($('vipFilterText') as HTMLInputElement | null)?.value ?? '').trim().toLowerCase();
+    const status = ($('vipFilterStatus') as HTMLSelectElement | null)?.value ?? 'active';
+    const level = ($('vipFilterLevel') as HTMLSelectElement | null)?.value ?? '';
+
+    const items = vipData.items.filter((v) => {
+      const rem = vipRemaining(v);
+      if (status === 'active' && !v.active) return false;
+      if (status === 'expired' && v.active) return false;
+      if (status === 'expiring' && rem.cls !== 'expiring') return false;
+      if (level && String(v.active ? v.accountLevel : v.storedAccountLevel) !== level) return false;
+      if (text && !v.username.toLowerCase().includes(text) && !v.email.toLowerCase().includes(text)) return false;
+      return true;
+    });
+
+    list.innerHTML = items.length ? `
+      <p class="muted">${items.length} cuenta(s). Consultado: ${esc(fmtDate(vipData.checkedAt))}</p>
+      <div class="table-scroll">
+        <table class="adm-table">
+          <thead><tr><th>Cuenta</th><th>Correo</th><th>Nivel</th><th>Vence</th><th>Restante</th><th>Conexión</th><th>Acciones</th></tr></thead>
+          <tbody>
+            ${items.map((v) => {
+              const rem = vipRemaining(v);
+              const lvl = v.active ? v.accountLevel : v.storedAccountLevel;
+              return `
+              <tr data-vip-user="${esc(v.username)}" data-vip-level="${lvl}">
+                <td><button type="button" class="link-button" data-open-account="${esc(v.username)}"><strong>${esc(v.username)}</strong></button>
+                  ${v.status !== 'active' ? badge(v.status) : ''}</td>
+                <td>${esc(v.email || '-')}</td>
+                <td>VIP ${lvl}</td>
+                <td>${esc(fmtDate(v.expiresAt))}</td>
+                <td><span class="badge-status st-vip-${rem.cls}">${esc(rem.label)}</span></td>
+                <td>${v.online ? '<span class="st-online">● Online</span>' : '<span class="st-offline">● Offline</span>'}</td>
+                <td><div class="row-actions">
+                  <button type="button" class="btn adm-small" data-vip-act="extend">+30 días</button>
+                  <button type="button" class="btn btn-ghost adm-small" data-vip-act="edit">Editar</button>
+                  ${v.active ? '<button type="button" class="btn btn-danger adm-small" data-vip-act="remove">Quitar</button>' : ''}
+                </div></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>` : '<p class="result-empty">No hay cuentas que coincidan con el filtro.</p>';
+  }
+
+  async function loadVips() {
+    const list = $('vipList');
+    if (!list) return;
+    if (!vipData) list.innerHTML = '<p class="result-empty">Cargando...</p>';
+    try {
+      vipData = await api<VipList>('vips');
+      vipLoaded = true;
+      renderVipSummary(vipData);
+      renderVipList();
+      updateVipForm();
+    } catch (error) {
+      list.innerHTML = '';
+      setFlash(error instanceof Error ? error.message : 'Error', 'error');
+    }
+  }
+
+  $('refreshVip')?.addEventListener('click', loadVips);
+  ['vipFilterText', 'vipFilterStatus', 'vipFilterLevel'].forEach((id) =>
+    $(id)?.addEventListener(id === 'vipFilterText' ? 'input' : 'change', renderVipList));
+
+  const vipAssignForm = $('vipAssignForm') as HTMLFormElement | null;
+
+  function vipFormValues() {
+    const data = new FormData(vipAssignForm!);
+    return {
+      username: String(data.get('username') ?? '').trim(),
+      level: Number(data.get('level') ?? 3),
+      days: Number(data.get('days')),
+      mode: (String(data.get('mode') ?? 'extend') as VipMode),
+    };
+  }
+
+  const fmtDay = (d: Date) => d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  /** Actualiza chips, visibilidad de campos y la explicación del resultado. */
+  function updateVipForm() {
+    if (!vipAssignForm) return;
+    const { username, level, days, mode } = vipFormValues();
+    const remove = level === 0;
+    vipAssignForm.classList.toggle('is-remove', remove);
+    vipAssignForm.querySelectorAll<HTMLButtonElement>('.chip').forEach((c) => c.classList.toggle('is-active', Number(c.dataset.days) === days));
+
+    const submit = $('vipAssignSubmit') as HTMLButtonElement;
+    submit.textContent = remove ? 'Quitar VIP' : mode === 'extend' ? 'Extender VIP' : 'Asignar VIP';
+    submit.classList.toggle('btn-danger', remove);
+
+    const hint = $('vipAssignHint');
+    if (!hint) return;
+    const who = username ? `<strong>${esc(username)}</strong>` : 'la cuenta';
+    const current = username ? vipData?.items.find((v) => v.username.toLowerCase() === username.toLowerCase()) : undefined;
+    const currentText = current?.active ? `Tiene VIP ${current.accountLevel} hasta el ${esc(fmtDay(new Date(current.expiresAt!)))}. ` : current ? 'Su VIP está vencido. ' : '';
+
+    if (remove) {
+      hint.innerHTML = `${currentText}${who} pasa a FREE en el próximo ingreso.`;
+      return;
+    }
+    if (!Number.isInteger(days) || days < 1 || days > 3650) {
+      hint.innerHTML = '<span class="error">La duración debe ser de 1 a 3650 días.</span>';
+      return;
+    }
+    const base = mode === 'extend' && current?.active ? new Date(current.expiresAt!).getTime() : Date.now();
+    const until = `<strong>${esc(fmtDay(new Date(base + days * DAY_MS)))}</strong>`;
+    hint.innerHTML = mode === 'extend'
+      ? `${currentText}Suma ${days} días${current?.active ? ' a su vencimiento' : ' desde hoy'}: VIP ${level} hasta el ${until}.`
+      : `${currentText}Reemplaza el VIP actual: VIP ${level} desde hoy hasta el ${until}.`;
+  }
+
+  vipAssignForm?.addEventListener('click', (event) => {
+    const preset = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-days]');
+    if (!preset) return;
+    (vipAssignForm.elements.namedItem('days') as HTMLInputElement).value = preset.dataset.days!;
+    updateVipForm();
+  });
+  vipAssignForm?.addEventListener('input', updateVipForm);
+  vipAssignForm?.addEventListener('change', updateVipForm);
+  vipAssignForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const { username, level, days, mode } = vipFormValues();
+    if (!username) {
+      setFlash('Indicá la cuenta.', 'error');
+      (vipAssignForm.elements.namedItem('username') as HTMLInputElement).focus();
+      return;
+    }
+    confirmVip(username, level, days, mode);
+  });
+  updateVipForm();
+
+  $('vipList')?.addEventListener('click', (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-vip-act]');
+    if (!button) return;
+    const row = button.closest<HTMLElement>('[data-vip-user]');
+    const username = row?.dataset.vipUser;
+    const level = Number(row?.dataset.vipLevel);
+    if (!username) return;
+
+    switch (button.dataset.vipAct) {
+      case 'extend':
+        confirmVip(username, level, 30, 'extend');
+        break;
+      case 'remove':
+        confirmVip(username, 0, 0, 'set');
+        break;
+      case 'edit': {
+        if (!vipAssignForm) return;
+        const f = vipAssignForm.elements;
+        (f.namedItem('username') as HTMLInputElement).value = username;
+        (f.namedItem('level') as RadioNodeList).value = String(level);
+        (f.namedItem('mode') as RadioNodeList).value = 'extend';
+        updateVipForm();
+        const days = f.namedItem('days') as HTMLInputElement;
+        vipAssignForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        days.focus();
+        days.select();
+        break;
+      }
+    }
   });
 
   // ---------------------------------------------------------- online/audit
